@@ -8,6 +8,7 @@ import { PartidosModule } from './modules/partidos/partidos.module';
 import { VotacoesModule } from './modules/votacoes/votacoes.module';
 import { VotosModule } from './modules/votos/votos.module';
 import { IntegracaoModule } from './modules/integracao/integracao.module';
+import { StatsModule } from './modules/stats/stats.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { IntegracaoModule } from './modules/integracao/integracao.module';
     VotacoesModule,
     VotosModule,
     IntegracaoModule,
+    StatsModule,
   ],
 })
 export class AppModule {}
