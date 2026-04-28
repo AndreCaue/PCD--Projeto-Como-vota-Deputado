@@ -4,12 +4,18 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Calendar, BarChart3 } from "lucide-react";
+import { ArrowLeft, Calendar, BarChart3, Landmark } from "lucide-react";
 import { deputadosService } from "@/services/api";
 import type { Deputado, Voto, EstatisticasDeputado, TipoVoto } from "@/types";
 import { LABEL_VOTO, COR_VOTO, BG_VOTO } from "@/types";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useBensPatrimonio, useResumoPatrimonio } from "@/hooks/usePatrimonio";
+import {
+  PatrimonioCard,
+  PatrimonioCardSkeleton,
+} from "@/components/patrimonio/PatrimonioCard";
+import { ListaBens } from "@/components/patrimonio/ListaBens";
 
 export default function DeputadoPage() {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +25,9 @@ export default function DeputadoPage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  const { data: bens, loading: loadingBens } = useBensPatrimonio(id);
+  const { data: resumo, loading: loadingResumo } = useResumoPatrimonio(id);
 
   const carregar = useCallback(async () => {
     setLoading(true);
@@ -49,6 +58,8 @@ export default function DeputadoPage() {
         Deputado não encontrado.
       </div>
     );
+
+  console.log(resumo, "resumo do hook");
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
@@ -98,6 +109,33 @@ export default function DeputadoPage() {
           )}
         </div>
       </div>
+
+      {loadingBens || loadingResumo ? (
+        <div className="mb-6">
+          <PatrimonioCardSkeleton />
+        </div>
+      ) : resumo?.dados_disponiveis ? (
+        <div className="mb-6">
+          <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+            <Landmark className="w-5 h-5" /> Patrimônio Declarado
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <PatrimonioCard
+              nome={deputado.nome}
+              patrimonioTotal={resumo.total_declarado || 0}
+              totalBens={bens?.length || 0}
+              anoBase={resumo.ano_referencia || 2022}
+              variacaoPercentual={resumo.variacao_pct}
+              variacaoAbsoluta={resumo.variacao_abs}
+            />
+            {bens && bens.length > 0 && (
+              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 max-h-80 overflow-y-auto">
+                <ListaBens bens={bens} />
+              </div>
+            )}
+          </div>
+        </div>
+      ) : null}
 
       {/* Estatísticas de votação */}
       {stats && stats.total > 0 && (

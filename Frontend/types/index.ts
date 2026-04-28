@@ -170,6 +170,39 @@ export type TipoOrientacao =
   | "LIBERADO"
   | "AUSENTE";
 
+export interface BemPatrimonio {
+  id: number;
+  ano_eleicao: number;
+  tipo: string;
+  descricao: string;
+  valor: number;
+  score_match: number | null;
+}
+
+export interface PatrimonioDeputado {
+  id: string;
+  nome: string;
+  foto?: string;
+  partido: string;
+  estado: string;
+  patrimonio_total: number;
+  total_bens: number;
+  bens: BemPatrimonio[];
+  ano_base: number;
+  ultima_atualizacao: string;
+}
+
+export interface ResumoPatrimonio {
+  deputados: {
+    id: string;
+    nome: string;
+    patrimonio_total: number;
+    total_bens: number;
+  }[];
+  ano_base: number;
+  ultima_atualizacao: string;
+}
+
 export const LABEL_ORIENTACAO: Record<TipoOrientacao, string> = {
   SIM: "Sim",
   NAO: "Não",

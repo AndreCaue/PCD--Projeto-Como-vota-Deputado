@@ -174,3 +174,47 @@ export const dropdownService = {
   comissoes: () =>
     api.get("/api/v1/lookups/tipos-comissoes").then((r) => r.data),
 };
+
+export interface BemPatrimonio {
+  id: number;
+  ano_eleicao: number;
+  tipo: string;
+  descricao: string;
+  valor: number;
+  score_match: number | null;
+}
+
+export interface PatrimonioDeputado {
+  deputados: {
+    id: string;
+    nome: string;
+    foto?: string;
+    partido: string;
+    estado: string;
+    patrimonio_total: number;
+    total_bens: number;
+    bens: BemPatrimonio[];
+  };
+  ano_base: number;
+  ultima_atualizacao: string;
+}
+
+export const patrimonioService = {
+  listar_bens: (deputadoId: string, ano?: number, tipo?: string) =>
+    api
+      .get<BemPatrimonio[]>(`/api/v1/patrimonio/${deputadoId}`, {
+        params: { ano, tipo },
+      })
+      .then((r) => r.data),
+
+  resumo: (deputadoId: string) =>
+    api.get(`/api/v1/patrimonio/${deputadoId}/resumo`).then((r) => r.data),
+
+  evolucao: (deputadoId: string) =>
+    api.get(`/api/v1/patrimonio/${deputadoId}/evolucao`).then((r) => r.data),
+
+  topVariacao: (limit = 10) =>
+    api
+      .get("/api/v1/patrimonio/top-variacao", { params: { limit } })
+      .then((r) => r.data),
+};
