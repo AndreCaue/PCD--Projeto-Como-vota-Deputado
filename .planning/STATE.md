@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Integração com QSA da Receita Federal
 status: completed
-last_updated: "2026-06-11T12:00:00.000Z"
-last_activity: 2026-06-11 -- Phase 01 foundation completed (50 tests passing)
+last_updated: "2026-06-12T03:04:39.628Z"
+last_activity: 2026-06-11 -- Phase 01 execution completed (50/50 tests passing)
 progress:
   total_phases: 3
   completed_phases: 1
@@ -40,6 +40,7 @@ See: .planning/PROJECT.md (updated 2026-05-29)
 ## Accumulated Context
 
 ### Key Decisions from Phase 1
+
 - `relationship_type` (Boolean) added to Relacao model: `False=cpf_match`, `True=nome_match`
 - Dual strategy matching: exact CPF first, then rapidfuzz fuzzy name matching (threshold: 75)
 - QSA ingestion via background task (`POST /atualizar-qsa`) with chunked CSV processing (10k rows)
