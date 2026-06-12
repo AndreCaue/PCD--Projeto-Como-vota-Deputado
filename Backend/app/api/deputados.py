@@ -72,7 +72,21 @@ def get_empresas_deputado(
     if not rels:
         service.gerar_relacoes_deputado(id)
         rels = service.get_relacoes_com_detalhes(id)
-    return rels
+    from ..models.qsa_metadata import QsaMetadata
+    from datetime import datetime
+    meta = db.query(QsaMetadata).order_by(
+        QsaMetadata.last_import_at.desc()).first()
+    if not meta:
+        freshness = {"qsa_data_disponivel": False}
+    else:
+        days_stale = (datetime.utcnow() - meta.last_import_at).days
+        freshness = {
+            "qsa_data_disponivel": True,
+            "ultima_atualizacao_qsa": meta.last_import_at.isoformat(),
+            "dias_desde_atualizacao": days_stale,
+            "dados_antigos": days_stale > 45,
+        }
+    return {"data": rels, "freshness": freshness}
 
 
 @router.get("/{id}/votos")
