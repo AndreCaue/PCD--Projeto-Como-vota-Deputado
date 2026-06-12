@@ -1,3 +1,4 @@
+import datetime
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -8,6 +9,8 @@ from app.main import app
 from app.models.empresa import Empresa, Socio, Relacao
 from app.models.deputado import Deputado
 from app.models.partido import Partido
+from app.models.qsa_metadata import QsaMetadata
+from app.models.config import Config
 
 
 TEST_DATABASE_URL = "sqlite:///./test.db"
@@ -107,3 +110,42 @@ def sample_relacao(db_session, sample_deputado, sample_empresa):
     db_session.add(relacao)
     db_session.commit()
     return relacao
+
+
+@pytest.fixture
+def sample_empresa_with_capital(db_session):
+    empresa = Empresa(
+        cnpj="99887766000199",
+        razao_social="Empresa Alto Capital Ltda",
+        nome_fantasia="Alto Capital",
+        municipio="São Paulo",
+        estado="SP",
+        situacao="ATIVA",
+        capital_social=2000000.00,
+    )
+    db_session.add(empresa)
+    db_session.commit()
+    return empresa
+
+
+@pytest.fixture
+def sample_qsa_metadata(db_session):
+    meta = QsaMetadata(
+        last_import_at=datetime.datetime(2026, 1, 1),
+        status="success",
+        row_count=1000,
+    )
+    db_session.add(meta)
+    db_session.commit()
+    return meta
+
+
+@pytest.fixture
+def sample_config(db_session):
+    config = Config(
+        key="alta_exposicao_threshold",
+        value="1000000.0",
+    )
+    db_session.add(config)
+    db_session.commit()
+    return config
