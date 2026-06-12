@@ -2,9 +2,11 @@ import os
 import zipfile
 import tempfile
 import logging
+from datetime import datetime
 import pandas as pd
 import httpx
 from sqlalchemy.orm import Session
+from sqlalchemy.dialects.sqlite import insert as sqlite_upsert
 from ..database import SessionLocal
 from ..models.empresa import Empresa, Socio
 
@@ -64,6 +66,94 @@ def processar_csv_socios(csv_path: str, db: Session):
         db.commit()
         total += len(chunk)
         logger.info("Sócios processados: %d", total)
+
+
+def processar_csv_empresas_incremental(csv_path: str, db: Session):
+    total = 0
+    for chunk in pd.read_csv(csv_path, chunksize=10000, dtype=str):
+        records = []
+        for _, row in chunk.iterrows():
+            capital_raw = row.get("capital_social", "").strip()
+            capital_value = None
+            if capital_raw:
+                try:
+                    # Brazilian format: "1.000.000,00" -> 1000000.00
+                    capital_value = float(
+                        capital_raw.replace(".", "").replace(",", ".")
+                    )
+                except ValueError:
+                    pass
+            records.append({
+                "cnpj": row.get("cnpj", ""),
+                "razao_social": row.get("razao_social", ""),
+                "nome_fantasia": row.get("nome_fantasia", ""),
+                "municipio": row.get("municipio", ""),
+                "estado": row.get("estado", ""),
+                "situacao": row.get("situacao", ""),
+                "capital_social": capital_value,
+            })
+        # CRITICAL: All dicts in records MUST have identical keys
+        stmt = sqlite_upsert(Empresa).values(records)
+        stmt = stmt.on_conflict_do_update(
+            index_elements=[Empresa.cnpj],
+            set_={
+                "razao_social": stmt.excluded.razao_social,
+                "nome_fantasia": stmt.excluded.nome_fantasia,
+                "municipio": stmt.excluded.municipio,
+                "estado": stmt.excluded.estado,
+                "situacao": stmt.excluded.situacao,
+                "capital_social": stmt.excluded.capital_social,
+            }
+        )
+        db.execute(stmt)
+        db.commit()
+        total += len(chunk)
+        logger.info("Empresas upserted (incremental): %d", total)
+    return total
+
+
+def importar_qsa_incremental():
+    db = SessionLocal()
+    tmp = tempfile.TemporaryDirectory()
+    try:
+        logger.info("Iniciando importação QSA incremental...")
+        zips = baixar_qsa(tmp.name)
+        empresa_total = 0
+        socio_total = 0
+        for nome, zip_path in zips.items():
+            csvs = extrair_csvs(zip_path, tmp.name)
+            for csv_path in csvs:
+                if "EMPRECSV" in csv_path.upper() or "empres" in nome.lower():
+                    empresa_total = processar_csv_empresas_incremental(csv_path, db)
+                elif "SOCIOCSV" in csv_path.upper() or "soci" in nome.lower():
+                    socio_total = processar_csv_socios(csv_path, db)
+        from ..models.qsa_metadata import QsaMetadata
+        meta = QsaMetadata(
+            last_import_at=datetime.utcnow(),
+            status="success",
+            row_count=empresa_total + socio_total
+        )
+        db.add(meta)
+        db.commit()
+        logger.info("Importação QSA incremental concluída com sucesso!")
+    except Exception as e:
+        logger.error("Erro na importação QSA incremental: %s", e)
+        db.rollback()
+        try:
+            from ..models.qsa_metadata import QsaMetadata
+            meta = QsaMetadata(
+                last_import_at=datetime.utcnow(),
+                status="failed",
+                row_count=0,
+                error_message=str(e)
+            )
+            db.add(meta)
+            db.commit()
+        except Exception:
+            pass
+    finally:
+        db.close()
+        tmp.cleanup()
 
 
 def baixar_qsa(temp_dir: str) -> dict:
