@@ -32,3 +32,28 @@ async def popular_banco_inicial():
         logger.error(f"Erro na população inicial: {e}")
     finally:
         db.close()
+
+
+async def check_qsa_freshness():
+    """Background check: if QSA data >7 days stale, auto-trigger incremental import."""
+    db = SessionLocal()
+    try:
+        from ..models.qsa_metadata import QsaMetadata
+        from ..ingest.import_qsa import importar_qsa_incremental
+        metadata = db.query(QsaMetadata).order_by(
+            QsaMetadata.last_import_at.desc()).first()
+        if metadata:
+            days_stale = (datetime.utcnow() - metadata.last_import_at).days
+            if days_stale > 7:
+                logger.info(
+                    "QSA data %d dias desatualizada — acionando atualização incremental",
+                    days_stale
+                )
+                importar_qsa_incremental()
+        else:
+            logger.info("Nenhum metadado QSA encontrado — acionando importação inicial")
+            importar_qsa_incremental()
+    except Exception as e:
+        logger.error(f"Erro na verificação de frescor QSA: {e}")
+    finally:
+        db.close()
