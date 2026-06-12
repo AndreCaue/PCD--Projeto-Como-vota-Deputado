@@ -19,13 +19,13 @@ class RelacaoService:
     def buscar_empresas_por_nome(self, nome: str):
         return self.db.query(Socio).filter(Socio.nome_socio.ilike(f"%{nome}%")).all()
 
-    def _calc_confianca_nome(self, nome_deputado: str, nome_socio: str) -> int:
+    def _calc_confianca_nome(self, nome_deputado: str, nome_socio: str) -> tuple:
         score = fuzz.token_sort_ratio(nome_deputado.lower(), nome_socio.lower())
         if score >= 90:
-            return 85
+            return (score, 85)
         if score >= 75:
-            return 60
-        return 0
+            return (score, 60)
+        return (score, 0)
 
     def gerar_relacoes_deputado(self, deputado_id: str):
         deputado = self.db.query(Deputado).filter(
@@ -52,8 +52,8 @@ class RelacaoService:
         for s in socios_nome:
             if any(r["cnpj"] == s.cnpj for r in relacoes_encontradas):
                 continue
-            confianca = self._calc_confianca_nome(deputado.nome, s.nome_socio)
-            if confianca < FUZZY_THRESHOLD:
+            raw_score, confianca = self._calc_confianca_nome(deputado.nome, s.nome_socio)
+            if raw_score < FUZZY_THRESHOLD:
                 continue
             relacoes_encontradas.append({
                 "cnpj": s.cnpj,
