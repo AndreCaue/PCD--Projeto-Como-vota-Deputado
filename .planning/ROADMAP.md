@@ -3,7 +3,7 @@
 ## Phases
 
 - [x] **Phase 1: Foundation** - Data Ingestion and Matching
-- [ ] **Phase 2: Enhancement** - Matching Refinement and Data Quality
+- [x] **Phase 2: Enhancement** - Matching Refinement and Data Quality
 - [ ] **Phase 3: Intelligence** - Conflict Detection and UX
 
 ## Phase Details
@@ -39,16 +39,16 @@
 Plans:
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — Foundation: Data Model + Schema Migration + Test Infrastructure
+- [x] 02-01-PLAN.md — Foundation: Data Model + Schema Migration + Test Infrastructure
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 02-02-PLAN.md — Service Layer: Confidence Score Bug Fix + Flag Computation
-- [ ] 02-03-PLAN.md — Data Pipeline: Incremental Import + Freshness Tracking + Startup Wiring
+- [x] 02-02-PLAN.md — Service Layer: Confidence Score Bug Fix + Flag Computation
+- [x] 02-03-PLAN.md — Data Pipeline: Incremental Import + Freshness Tracking + Startup Wiring
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 02-04-PLAN.md — API Endpoints: Paginated Listing + Inline Freshness + Update Trigger
+- [x] 02-04-PLAN.md — API Endpoints: Paginated Listing + Inline Freshness + Update Trigger
 
 ### Phase 3: Intelligence
 
@@ -69,5 +69,5 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | ✅ Complete | 2026-06-11 |
-| 2. Enhancement | 0/4 | Planning complete | - |
+| 2. Enhancement | 4/4 | ✅ Complete | 2026-06-12 |
 | 3. Intelligence | 0/4 | Not started | - |
