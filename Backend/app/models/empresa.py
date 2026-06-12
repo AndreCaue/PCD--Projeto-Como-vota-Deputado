@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Boolean, DateTime, func
+from sqlalchemy import Column, String, Integer, Boolean, DateTime, Float, func
 from .base import Base
 
 class Empresa(Base):
@@ -11,6 +11,7 @@ class Empresa(Base):
     municipio = Column(String, nullable=True)
     estado = Column(String, nullable=True)
     situacao = Column(String, nullable=True)
+    capital_social = Column(Float, nullable=True)
     criado_em = Column(DateTime, server_default=func.now())
 
 class Socio(Base):
@@ -33,4 +34,6 @@ class Relacao(Base):
     score_confianca = Column(Integer)
     relationship_type = Column(Boolean, index=True)
     origem = Column(String, nullable=True)
+    alta_exposicao = Column(Boolean, default=False, index=True)
+    via_conjuge = Column(Boolean, default=False)
     criado_em = Column(DateTime, server_default=func.now())
