@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Query, BackgroundTasks
 from ..database import get_db
 from ..services.integracao_service import IntegracaoService
 from ..models.votacao import SyncLog
-from ..ingest.import_qsa import importar_qsa_completo
+from ..ingest.import_qsa import importar_qsa_incremental
 from datetime import datetime
 
 router = APIRouter(prefix="/integracao", tags=["Integração"])
@@ -14,7 +14,7 @@ qsa_router = APIRouter(tags=["QSA"])
 
 @qsa_router.post("/atualizar-qsa")
 async def atualizar_qsa(background_tasks: BackgroundTasks):
-    background_tasks.add_task(importar_qsa_completo)
+    background_tasks.add_task(importar_qsa_incremental)
     return {"message": "Importação QSA iniciada em segundo plano"}
 
 
