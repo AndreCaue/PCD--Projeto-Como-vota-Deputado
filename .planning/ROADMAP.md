@@ -23,11 +23,17 @@
 **Depends on**: Phase 1
 **Requirements**: MAT-02, CONF-03, CONF-04, API-02, API-04, INF-02, INF-04, DQ-01, DQ-04
 **Success Criteria** (what must be TRUE):
-  1. User can view company matches found via spouse name (fuzzy matching) with confidence scores in API responses
-  2. System provides data freshness indicators in API responses showing QSA data last update timestamp
-  3. System supports incremental weekly QSA updates without full reprocessing
-  4. System maintains appropriate database indices for efficient querying of large deputy-company datasets
-**Plans**: TBD
+   1. User can view company matches found via spouse name (fuzzy matching) with confidence scores in API responses
+   2. System provides data freshness indicators in API responses showing QSA data last update timestamp
+   3. System supports incremental weekly QSA updates without full reprocessing
+   4. System maintains appropriate database indices for efficient querying of large deputy-company datasets
+**Plans**: 4 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Foundation: Data Model + Schema Migration + Test Infrastructure
+- [ ] 02-02-PLAN.md — Service Layer: Confidence Score Bug Fix + Flag Computation
+- [ ] 02-03-PLAN.md — Data Pipeline: Incremental Import + Freshness Tracking + Startup Wiring
+- [ ] 02-04-PLAN.md — API Endpoints: Paginated Listing + Inline Freshness + Update Trigger
 ### Phase 3: Intelligence
 **Goal**: Detect potential conflicts of interest and provide meaningful insights through graduated conflict scoring and exposure flags.
 **Depends on**: Phase 2
@@ -44,5 +50,5 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | ✅ Complete | 2026-06-11 |
-| 2. Enhancement | 0/4 | Not started | - |
+| 2. Enhancement | 0/4 | Planning complete | - |
 | 3. Intelligence | 0/4 | Not started | - |
