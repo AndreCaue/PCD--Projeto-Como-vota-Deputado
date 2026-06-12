@@ -583,22 +583,16 @@ CREATE INDEX IF NOT EXISTS idx_relacoes_alta_exposicao ON relacoes(alta_exposica
 
 **If this table is empty:** All claims in this research were verified or cited.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **What is the exact column name for `capital_social` in the Empresas CSV?**
-   - What we know: The field exists in the Receita Federal layout as "Capital Social da Empresa". The current CSV processing uses English column names (`"cnpj"`, `"razao_social"`, etc.), suggesting either preprocessing or a specific data source variant.
-   - What's unclear: Whether the column is named `"capital_social"`, `"CAPITAL_SOCIAL"`, or something else in the actual downloaded CSV.
-   - Recommendation: Inspect the actual CSV header during implementation (add debug logging to print first row headers). Handle with `row.get("capital_social", row.get("CAPITAL_SOCIAL", ""))`.
+   - **RESOLVED:** Plan 02-03 uses defensive `row.get("capital_social", row.get("CAPITAL_SOCIAL", "")).strip()` — handles both common column name variants.
 
 2. **Should relacoes counts on GET /deputados/empresas be pre-computed or computed at query time?**
-   - What we know: The endpoint uses GROUP BY + COUNT, which is efficient with a composite index on (deputado_id, cnpj). The dataset is small enough (fewer than 1000 deputies, tens of thousands of relacoes) for query-time computation.
-   - What's unclear: Whether a pre-computed count denormalized on the Deputado model is needed for performance at scale.
-   - Recommendation: Compute at query time for now. Add denormalization only if profiling shows it's a bottleneck. [ASSUMED]
+   - **RESOLVED:** Plan 02-04 uses GROUP BY + COUNT at query time with composite index `idx_relacoes_deputado_cnpj`. Denormalization deferred pending profiling.
 
 3. **Where should the `check_qsa_freshness` startup task live?**
-   - What we know: `sync_scheduler.py` already has `popular_banco_inicial()`, and `main.py` imports it.
-   - What's unclear: Whether to add a new `check_qsa_freshness.py` module or extend `sync_scheduler.py`.
-   - Recommendation: Add `check_qsa_freshness` to `sync_scheduler.py` for consistency, import and `create_task` in `main.py` lifespan alongside the existing `popular_banco_inicial()` call.
+   - **RESOLVED:** Plan 02-03 places `check_qsa_freshness` in `sync_scheduler.py` alongside `popular_banco_inicial()`, wired in `main.py` lifespan.
 
 ## Validation Architecture
 
