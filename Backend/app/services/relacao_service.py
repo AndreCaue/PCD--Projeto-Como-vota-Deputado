@@ -13,6 +13,12 @@ class RelacaoService:
     def __init__(self, db: Session):
         self.db = db
 
+    def _get_alta_threshold(self) -> float:
+        from ..models.config import Config
+        config = self.db.query(Config).filter(
+            Config.key == "alta_exposicao_threshold").first()
+        return float(config.value) if config else 1000000.0
+
     def buscar_empresas_por_cpf(self, cpf: str):
         return self.db.query(Socio).filter(Socio.cpf_socio == cpf).all()
 
@@ -63,6 +69,20 @@ class RelacaoService:
                 "nome_socio": s.nome_socio
             })
 
+        # 3. Compute flags for each relationship
+        threshold = self._get_alta_threshold()
+        for r in relacoes_encontradas:
+            empresa = self.db.query(Empresa).filter(
+                Empresa.cnpj == r["cnpj"]).first()
+            alta_exposicao = (
+                empresa is not None
+                and empresa.capital_social is not None
+                and empresa.capital_social > threshold
+            )
+            via_conjuge = r["tipo_relacao"] == "nome_match"
+            r["alta_exposicao"] = alta_exposicao
+            r["via_conjuge"] = via_conjuge
+
         self.db.query(Relacao).filter(
             Relacao.deputado_id == deputado_id).delete()
 
@@ -73,7 +93,9 @@ class RelacaoService:
                 tipo_relacao=r["tipo_relacao"],
                 relationship_type=r.get("relationship_type"),
                 score_confianca=r["score_confianca"],
-                origem="import_socios"
+                origem="import_socios",
+                alta_exposicao=r["alta_exposicao"],
+                via_conjuge=r["via_conjuge"],
             )
             self.db.add(new_rel)
 
@@ -96,9 +118,12 @@ class RelacaoService:
                 "relationship_type": r.relationship_type,
                 "score": r.score_confianca,
                 "score_confianca": r.score_confianca,
+                "alta_exposicao": r.alta_exposicao,
+                "via_conjuge": r.via_conjuge,
                 "empresa": {
                     "razao_social": empresa.razao_social if empresa else "Não cadastrada",
-                    "municipio": empresa.municipio if empresa else None
+                    "municipio": empresa.municipio if empresa else None,
+                    "capital_social": empresa.capital_social if empresa else None
                 }
             })
         return resultado
