@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, DateTime, func
+from sqlalchemy import Column, String, Integer, Boolean, DateTime, func
 from .base import Base
 
 class Empresa(Base):
@@ -31,5 +31,6 @@ class Relacao(Base):
     cnpj = Column(String, index=True)
     tipo_relacao = Column(String) # cpf_match, nome_match
     score_confianca = Column(Integer)
+    relationship_type = Column(Boolean, index=True)
     origem = Column(String, nullable=True)
     criado_em = Column(DateTime, server_default=func.now())

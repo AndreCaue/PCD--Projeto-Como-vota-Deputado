@@ -56,6 +56,24 @@ def get_relacoes(id: str, db: Session = Depends(get_db)):
     return rels
 
 
+@router.get("/{id}/empresas")
+def get_empresas_deputado(
+    id: str,
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1),
+    db: Session = Depends(get_db)
+):
+    deputado = db.query(Deputado).filter(Deputado.id == id).first()
+    if not deputado:
+        raise HTTPException(status_code=404, detail="Deputado não encontrado")
+    service = RelacaoService(db)
+    rels = service.get_relacoes_com_detalhes(id)
+    if not rels:
+        service.gerar_relacoes_deputado(id)
+        rels = service.get_relacoes_com_detalhes(id)
+    return rels
+
+
 @router.get("/{id}/votos")
 def get_votos_deputado(
     id: str,

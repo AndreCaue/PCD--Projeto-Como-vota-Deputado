@@ -33,6 +33,7 @@ app.add_middleware(
 app.include_router(stats.router)
 app.include_router(deputados.router)
 app.include_router(integracao.router)
+app.include_router(integracao.qsa_router)
 app.include_router(votacoes.router)
 app.include_router(partidos.router)
 app.include_router(patrimonio.router, prefix='/api/v1')
