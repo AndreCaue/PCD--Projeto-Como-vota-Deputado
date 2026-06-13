@@ -98,6 +98,7 @@ def processar_csv_socios(csv_path: str, db: Session):
         db.commit()
         total += len(chunk)
         logger.info("Sócios processados: %d", total)
+    return total
 
 
 def processar_csv_empresas_incremental(csv_path: str, db: Session):
