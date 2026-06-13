@@ -8,7 +8,7 @@ import httpx
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.sqlite import insert as sqlite_upsert
 from ..database import SessionLocal
-from ..models.empresa import Empresa, Socio
+from ..models.empresa import Empresa, Socio, EmpresaCnaeSecundario
 
 logger = logging.getLogger(__name__)
 
@@ -47,11 +47,43 @@ def processar_csv_empresas(csv_path: str, db: Session):
     total = 0
     for chunk in pd.read_csv(csv_path, chunksize=10000, dtype=str):
         for _, row in chunk.iterrows():
-            record = {"cnpj": row.get("cnpj", ""), "razao_social": row.get("razao_social", ""), "nome_fantasia": row.get("nome_fantasia", ""), "municipio": row.get("municipio", ""), "estado": row.get("estado", ""), "situacao": row.get("situacao", "")}
+            record = {
+                "cnpj": row.get("cnpj", ""),
+                "razao_social": row.get("razao_social", ""),
+                "nome_fantasia": row.get("nome_fantasia", ""),
+                "municipio": row.get("municipio", ""),
+                "estado": row.get("estado", ""),
+                "situacao": row.get("situacao", ""),
+                "cnae_principal": row.get("cnae_principal", "").strip() or None,
+                "cnae_descricao": row.get("cnae_descricao", "").strip() or None,
+            }
             if not validate_qsa_data(record):
                 continue
-            empresa = Empresa(cnpj=record["cnpj"], razao_social=record["razao_social"], nome_fantasia=record["nome_fantasia"], municipio=record["municipio"], estado=record["estado"], situacao=record["situacao"])
+            empresa = Empresa(
+                cnpj=record["cnpj"],
+                razao_social=record["razao_social"],
+                nome_fantasia=record["nome_fantasia"],
+                municipio=record["municipio"],
+                estado=record["estado"],
+                situacao=record["situacao"],
+                cnae_principal=record["cnae_principal"],
+                cnae_descricao=record["cnae_descricao"],
+            )
             db.add(empresa)
+            db.flush()
+
+            cnae_secundaria_raw = row.get("cnae_secundaria", "").strip()
+            if cnae_secundaria_raw:
+                for codigo in cnae_secundaria_raw.split(";"):
+                    codigo = codigo.strip()
+                    if codigo:
+                        sec = EmpresaCnaeSecundario(
+                            cnpj=record["cnpj"],
+                            cnae_secundario=codigo,
+                            cnae_descricao=record["cnae_descricao"],
+                        )
+                        db.add(sec)
+
         db.commit()
         total += len(chunk)
         logger.info("Empresas processadas: %d", total)
@@ -91,6 +123,8 @@ def processar_csv_empresas_incremental(csv_path: str, db: Session):
                 "estado": row.get("estado", ""),
                 "situacao": row.get("situacao", ""),
                 "capital_social": capital_value,
+                "cnae_principal": row.get("cnae_principal", "").strip() or None,
+                "cnae_descricao": row.get("cnae_descricao", "").strip() or None,
             })
         # CRITICAL: All dicts in records MUST have identical keys
         stmt = sqlite_upsert(Empresa).values(records)
@@ -103,9 +137,29 @@ def processar_csv_empresas_incremental(csv_path: str, db: Session):
                 "estado": stmt.excluded.estado,
                 "situacao": stmt.excluded.situacao,
                 "capital_social": stmt.excluded.capital_social,
+                "cnae_principal": stmt.excluded.cnae_principal,
+                "cnae_descricao": stmt.excluded.cnae_descricao,
             }
         )
         db.execute(stmt)
+        db.commit()
+
+        for _, row in chunk.iterrows():
+            cnpj_raw = row.get("cnpj", "").strip()
+            cnae_secundaria_raw = row.get("cnae_secundaria", "").strip()
+            if cnae_secundaria_raw and cnpj_raw:
+                db.query(EmpresaCnaeSecundario).filter(
+                    EmpresaCnaeSecundario.cnpj == cnpj_raw
+                ).delete()
+                for codigo in cnae_secundaria_raw.split(";"):
+                    codigo = codigo.strip()
+                    if codigo:
+                        sec = EmpresaCnaeSecundario(
+                            cnpj=cnpj_raw,
+                            cnae_secundario=codigo,
+                            cnae_descricao=row.get("cnae_descricao", "").strip() or None,
+                        )
+                        db.add(sec)
         db.commit()
         total += len(chunk)
         logger.info("Empresas upserted (incremental): %d", total)

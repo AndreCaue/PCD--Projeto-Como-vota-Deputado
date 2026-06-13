@@ -133,6 +133,21 @@ def ensure_schema():
             )
             logger.info("Indices ensured for conflict detection.")
 
+            # 9. Seed default conflict CNAE classes
+            existing_config = conn.execute(
+                text("SELECT key FROM config WHERE key = 'conflito_cnae_classes'")
+            ).fetchone()
+            if not existing_config:
+                conn.execute(
+                    text(
+                        "INSERT INTO config (key, value) VALUES "
+                        "('conflito_cnae_classes', '41204,70204,73190,86101')"
+                    )
+                )
+                logger.info("Default conflito_cnae_classes seeded in config table.")
+            else:
+                logger.info("conflito_cnae_classes already exists in config table — skipping seed.")
+
             conn.commit()
             logger.info("Schema migration completed successfully.")
 
