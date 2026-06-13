@@ -1,7 +1,7 @@
 import logging
 from sqlalchemy import inspect, text
 from ..database import engine, Base
-from ..models.empresa import Empresa, Socio, Relacao
+from ..models.empresa import Empresa, Socio, Relacao, EmpresaCnaeSecundario
 from ..models.qsa_metadata import QsaMetadata
 from ..models.config import Config
 
@@ -72,6 +72,66 @@ def ensure_schema():
                 )
             )
             logger.info("Indices ensured on relacoes table.")
+
+            # 5. Create EmpresaCnaeSecundario table idempotently
+            Base.metadata.create_all(
+                bind=engine,
+                tables=[EmpresaCnaeSecundario.__table__],
+            )
+            logger.info("Table empresa_cnae_secundario ensured.")
+
+            # 6. Add CNAE columns to empresas
+            empresas_cols = [col["name"] for col in inspector.get_columns("empresas")]
+
+            if "cnae_principal" not in empresas_cols:
+                conn.execute(
+                    text("ALTER TABLE empresas ADD COLUMN cnae_principal VARCHAR")
+                )
+                logger.info("Column cnae_principal added to empresas.")
+            else:
+                logger.info("Column cnae_principal already exists in empresas.")
+
+            if "cnae_descricao" not in empresas_cols:
+                conn.execute(
+                    text("ALTER TABLE empresas ADD COLUMN cnae_descricao VARCHAR")
+                )
+                logger.info("Column cnae_descricao added to empresas.")
+            else:
+                logger.info("Column cnae_descricao already exists in empresas.")
+
+            # 7. Add conflict detection columns to relacoes
+            relacoes_cols = [col["name"] for col in inspector.get_columns("relacoes")]
+
+            if "conflito_interesse" not in relacoes_cols:
+                conn.execute(
+                    text("ALTER TABLE relacoes ADD COLUMN conflito_interesse BOOLEAN DEFAULT 0")
+                )
+                logger.info("Column conflito_interesse added to relacoes.")
+            else:
+                logger.info("Column conflito_interesse already exists in relacoes.")
+
+            if "score_conflito" not in relacoes_cols:
+                conn.execute(
+                    text("ALTER TABLE relacoes ADD COLUMN score_conflito INTEGER DEFAULT 0")
+                )
+                logger.info("Column score_conflito added to relacoes.")
+            else:
+                logger.info("Column score_conflito already exists in relacoes.")
+
+            # 8. Create indices for new query patterns
+            conn.execute(
+                text(
+                    "CREATE INDEX IF NOT EXISTS idx_relacoes_conflito_interesse "
+                    "ON relacoes(conflito_interesse)"
+                )
+            )
+            conn.execute(
+                text(
+                    "CREATE INDEX IF NOT EXISTS idx_empresa_cnae_secundario_cnae "
+                    "ON empresa_cnae_secundario(cnae_secundario)"
+                )
+            )
+            logger.info("Indices ensured for conflict detection.")
 
             conn.commit()
             logger.info("Schema migration completed successfully.")

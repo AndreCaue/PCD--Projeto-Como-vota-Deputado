@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 from app.database import Base, get_db
 from app.main import app
-from app.models.empresa import Empresa, Socio, Relacao
+from app.models.empresa import Empresa, Socio, Relacao, EmpresaCnaeSecundario
 from app.models.deputado import Deputado
 from app.models.partido import Partido
 from app.models.qsa_metadata import QsaMetadata
@@ -149,3 +149,51 @@ def sample_config(db_session):
     db_session.add(config)
     db_session.commit()
     return config
+
+
+@pytest.fixture
+def sample_empresa_with_cnae(db_session):
+    from app.models.empresa import Empresa
+    emp = Empresa(
+        cnpj="33445566000188",
+        razao_social="Empresa CNAE Teste Ltda",
+        cnae_principal="4120400",
+        cnae_descricao="Construção de edifícios",
+        capital_social=500000.00,
+    )
+    db_session.add(emp)
+    db_session.commit()
+    return emp
+
+
+@pytest.fixture
+def sample_empresa_cnae_secundario(db_session, sample_empresa_with_cnae):
+    from app.models.empresa import EmpresaCnaeSecundario
+    cnaes = [
+        EmpresaCnaeSecundario(
+            cnpj=sample_empresa_with_cnae.cnpj,
+            cnae_secundario="7020400",
+            cnae_descricao="Atividades de consultoria em gestão empresarial",
+        ),
+        EmpresaCnaeSecundario(
+            cnpj=sample_empresa_with_cnae.cnpj,
+            cnae_secundario="7319002",
+            cnae_descricao="Publicidade",
+        ),
+    ]
+    for c in cnaes:
+        db_session.add(c)
+    db_session.commit()
+    return cnaes
+
+
+@pytest.fixture
+def sample_cnae_config(db_session):
+    from app.models.config import Config
+    cfg = Config(
+        key="conflito_cnae_classes",
+        value="41204,70204,73190,86101",
+    )
+    db_session.add(cfg)
+    db_session.commit()
+    return cfg

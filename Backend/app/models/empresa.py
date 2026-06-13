@@ -12,6 +12,8 @@ class Empresa(Base):
     estado = Column(String, nullable=True)
     situacao = Column(String, nullable=True)
     capital_social = Column(Float, nullable=True)
+    cnae_principal = Column(String, nullable=True)
+    cnae_descricao = Column(String, nullable=True)
     criado_em = Column(DateTime, server_default=func.now())
 
 class Socio(Base):
@@ -36,4 +38,16 @@ class Relacao(Base):
     origem = Column(String, nullable=True)
     alta_exposicao = Column(Boolean, default=False, index=True)
     via_conjuge = Column(Boolean, default=False)
+    conflito_interesse = Column(Boolean, default=False, index=True)
+    score_conflito = Column(Integer, default=0)
+    criado_em = Column(DateTime, server_default=func.now())
+
+
+class EmpresaCnaeSecundario(Base):
+    __tablename__ = "empresa_cnae_secundario"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    cnpj = Column(String, index=True)
+    cnae_secundario = Column(String, nullable=False)
+    cnae_descricao = Column(String, nullable=True)
     criado_em = Column(DateTime, server_default=func.now())
