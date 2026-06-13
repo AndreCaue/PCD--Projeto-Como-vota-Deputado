@@ -16,11 +16,12 @@ def list_deputados_empresas(
     estado: str = None,
     tem_conflito: bool = None,
     alta_exposicao: bool = None,
+    conflito_interesse: bool = None,
     page: int = Query(1, ge=1, le=200),
     limit: int = Query(50, ge=1, le=200),
     db: Session = Depends(get_db)
 ):
-    from sqlalchemy import func
+    from sqlalchemy import func, case
 
     query = (
         db.query(
@@ -29,6 +30,9 @@ def list_deputados_empresas(
             Partido.sigla.label("partido"),
             Deputado.estado,
             func.count(Relacao.cnpj).label("total_empresas"),
+            func.sum(
+                case((Relacao.conflito_interesse == True, 1), else_=0)
+            ).label("total_conflito"),
         )
         .outerjoin(Relacao, Deputado.id == Relacao.deputado_id)
         .outerjoin(Partido, Deputado.partido_id == Partido.id)
@@ -40,9 +44,16 @@ def list_deputados_empresas(
         query = query.filter(Deputado.estado == estado.upper())
     if tem_conflito is not None:
         if tem_conflito:
-            query = query.filter(Relacao.cnpj.isnot(None))
+            query = query.filter(Relacao.conflito_interesse == True)
         else:
-            query = query.having(func.count(Relacao.cnpj) == 0)
+            query = query.filter(
+                ~db.query(Relacao.deputado_id)
+                .filter(Relacao.deputado_id == Deputado.id)
+                .filter(Relacao.conflito_interesse == True)
+                .exists()
+            )
+    if conflito_interesse is not None:
+        query = query.filter(Relacao.conflito_interesse == conflito_interesse)
     if alta_exposicao is not None:
         query = query.filter(Relacao.alta_exposicao == alta_exposicao)
 
@@ -76,6 +87,7 @@ def list_deputados_empresas(
                 "partido": r.partido,
                 "estado": r.estado,
                 "total_empresas": r.total_empresas,
+                "total_conflito": r.total_conflito,
             }
             for r in rows
         ],

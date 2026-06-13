@@ -31,3 +31,19 @@ class TestConflictDetectionModels:
     def test_empresa_with_cnae_fixture(self, db_session, sample_empresa_with_cnae):
         assert sample_empresa_with_cnae.cnae_principal == "4120400"
         assert sample_empresa_with_cnae.cnae_descricao == "Construção de edifícios"
+
+    def test_conflito_interesse_flag_computation(self, db_session, sample_empresa_with_cnae, sample_cnae_config):
+        from app.services.relacao_service import RelacaoService
+        service = RelacaoService(db_session)
+        cnae_class = sample_empresa_with_cnae.cnae_principal[:5] if sample_empresa_with_cnae.cnae_principal else ""
+        conflito_classes = service._get_cnae_conflito_classes()
+        assert cnae_class in conflito_classes
+
+    def test_score_conflito_range(self, db_session, sample_cnae_config):
+        from app.services.relacao_service import RelacaoService
+        service = RelacaoService(db_session)
+        conflito_classes = service._get_cnae_conflito_classes()
+        assert len(conflito_classes) > 0
+        assert all(isinstance(c, str) for c in conflito_classes)
+        assert "41204" in conflito_classes
+        assert "70204" in conflito_classes

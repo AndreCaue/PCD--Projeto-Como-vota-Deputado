@@ -59,6 +59,39 @@ class TestDeputadosEmpresas:
             assert "qsa_data_disponivel" in freshness
 
 
+class TestQSAFreshness:
+    """GET /qsa/freshness endpoint tests (gap 02-04-01: DQ-04)."""
+
+    def test_qsa_freshness_endpoint_exists(self, client: TestClient):
+        """GET /qsa/freshness returns 200."""
+        response = client.get("/qsa/freshness")
+        assert response.status_code == 200
+
+    def test_qsa_freshness_dados_antigos(
+        self, client: TestClient, sample_qsa_metadata
+    ):
+        """dados_antigos=true when last_import_at >45 days ago."""
+        response = client.get("/qsa/freshness")
+        assert response.status_code == 200
+        data = response.json()
+        assert data.get("qsa_data_disponivel") is True
+        assert data.get("dados_antigos") is True, (
+            f"Expected dados_antigos=True for 2026-01-01 data. "
+            f"Got: {data}"
+        )
+        assert data.get("dias_desde_atualizacao", 0) > 45, (
+            f"Expected dias_desde_atualizacao > 45. Got: {data}"
+        )
+        assert "ultima_atualizacao_qsa" in data
+
+    def test_qsa_freshness_no_metadata(self, client: TestClient):
+        """Without metadata, returns qsa_data_disponivel=False."""
+        response = client.get("/qsa/freshness")
+        assert response.status_code == 200
+        data = response.json()
+        assert data.get("qsa_data_disponivel") is False
+
+
 class TestAPIDeputados:
     def test_list_deputados(self, client: TestClient, db_session, sample_deputado, sample_partido):
         response = client.get("/deputados")
@@ -118,6 +151,39 @@ class TestAPIDeputados:
         if len(data) > 0:
             item = data[0]
             assert "empresa" in item or "cnpj" in item
+
+    def test_list_deputados_empresas_conflict_fields(self, client: TestClient):
+        response = client.get("/deputados/empresas")
+        assert response.status_code == 200
+        data = response.json()
+        assert "data" in data
+        if len(data["data"]) > 0:
+            item = data["data"][0]
+            assert "total_conflito" in item
+
+    def test_list_deputados_empresas_filter_conflito_interesse(self, client: TestClient):
+        response = client.get("/deputados/empresas?conflito_interesse=true")
+        assert response.status_code == 200
+
+    def test_get_empresas_deputado_conflict_fields(self, client: TestClient, sample_deputado):
+        response = client.get(f"/deputados/{sample_deputado.id}/empresas")
+        assert response.status_code == 200
+        data = response.json()
+        assert "data" in data
+        if len(data["data"]) > 0:
+            rel = data["data"][0]
+            assert "conflito_interesse" in rel
+            assert "score_conflito" in rel
+            assert "cnae_principal" in rel.get("empresa", {})
+
+    def test_get_relacoes_conflict_fields(self, client: TestClient, sample_deputado):
+        response = client.get(f"/deputados/{sample_deputado.id}/relacoes")
+        assert response.status_code == 200
+        rels = response.json()
+        if len(rels) > 0:
+            rel = rels[0]
+            assert "conflito_interesse" in rel
+            assert "score_conflito" in rel
 
     def test_filter_deputados_by_partido(self, client: TestClient, sample_deputado, sample_partido):
         response = client.get("/deputados?partido=PT")
