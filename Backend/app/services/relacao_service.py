@@ -19,6 +19,38 @@ class RelacaoService:
             Config.key == "alta_exposicao_threshold").first()
         return float(config.value) if config else 1000000.0
 
+    def _get_cnae_conflito_classes(self) -> set:
+        from ..models.config import Config
+        config = self.db.query(Config).filter(
+            Config.key == "conflito_cnae_classes").first()
+        if config and config.value:
+            classes = set()
+            for c in config.value.split(","):
+                c = c.strip()
+                if c:
+                    classes.add(c)
+            return classes
+        return {"41204", "70204", "73190", "86101"}
+
+    def _is_cnae_conflito(self, cnae_principal: str) -> bool:
+        if not cnae_principal:
+            return False
+        conflito_classes = self._get_cnae_conflito_classes()
+        cnae_class = cnae_principal[:5]
+        return cnae_class in conflito_classes
+
+    def _get_cnae_secundarios_conflito(self, cnpj: str) -> bool:
+        from ..models.empresa import EmpresaCnaeSecundario
+        secundarios = self.db.query(EmpresaCnaeSecundario).filter(
+            EmpresaCnaeSecundario.cnpj == cnpj).all()
+        if not secundarios:
+            return False
+        conflito_classes = self._get_cnae_conflito_classes()
+        for sec in secundarios:
+            if sec.cnae_secundario and sec.cnae_secundario[:5] in conflito_classes:
+                return True
+        return False
+
     def buscar_empresas_por_cpf(self, cpf: str):
         return self.db.query(Socio).filter(Socio.cpf_socio == cpf).all()
 
@@ -71,6 +103,7 @@ class RelacaoService:
 
         # 3. Compute flags for each relationship
         threshold = self._get_alta_threshold()
+        conflito_classes = self._get_cnae_conflito_classes()
         for r in relacoes_encontradas:
             empresa = self.db.query(Empresa).filter(
                 Empresa.cnpj == r["cnpj"]).first()
@@ -80,8 +113,29 @@ class RelacaoService:
                 and empresa.capital_social > threshold
             )
             via_conjuge = r["tipo_relacao"] == "nome_match"
+
+            cnae_conflito = False
+            if empresa is not None and empresa.cnae_principal:
+                cnae_class = empresa.cnae_principal[:5]
+                cnae_conflito = cnae_class in conflito_classes
+
+            if not cnae_conflito and empresa is not None:
+                cnae_conflito = self._get_cnae_secundarios_conflito(r["cnpj"])
+
+            score = 0
+            if alta_exposicao:
+                score += 50
+            if cnae_conflito:
+                score += 30
+            if r["tipo_relacao"] == "cpf_match":
+                score += 20
+
+            conflito_interesse = score > 0
+
             r["alta_exposicao"] = alta_exposicao
             r["via_conjuge"] = via_conjuge
+            r["conflito_interesse"] = conflito_interesse
+            r["score_conflito"] = score
 
         self.db.query(Relacao).filter(
             Relacao.deputado_id == deputado_id).delete()
@@ -96,6 +150,8 @@ class RelacaoService:
                 origem="import_socios",
                 alta_exposicao=r["alta_exposicao"],
                 via_conjuge=r["via_conjuge"],
+                conflito_interesse=r["conflito_interesse"],
+                score_conflito=r["score_conflito"],
             )
             self.db.add(new_rel)
 
@@ -120,10 +176,14 @@ class RelacaoService:
                 "score_confianca": r.score_confianca,
                 "alta_exposicao": r.alta_exposicao,
                 "via_conjuge": r.via_conjuge,
+                "conflito_interesse": r.conflito_interesse,
+                "score_conflito": r.score_conflito,
                 "empresa": {
                     "razao_social": empresa.razao_social if empresa else "Não cadastrada",
                     "municipio": empresa.municipio if empresa else None,
-                    "capital_social": empresa.capital_social if empresa else None
+                    "capital_social": empresa.capital_social if empresa else None,
+                    "cnae_principal": empresa.cnae_principal if empresa else None,
+                    "cnae_descricao": empresa.cnae_descricao if empresa else None,
                 }
             })
         return resultado
