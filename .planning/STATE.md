@@ -2,61 +2,73 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-06-13T22:25:46.908Z"
-last_activity: 2026-06-13 -- Phase 03 marked complete
+status: audit_complete
+last_updated: "2026-06-13"
+last_activity: 2026-06-13 -- Milestone v1.0 audit complete
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 3
   total_plans: 11
-  completed_plans: 9
-  percent: 33
+  completed_plans: 11
+  percent: 100
 ---
 
 ---
 milestone: v1.0
 name: "Integração com QSA da Receita Federal"
-status: Executing Phase 03
+status: Audit Complete
 progress:
-  requirements_defined: 12
-  requirements_mapped: 12
-  phases_completed: 1
+  requirements_defined: 23
+  requirements_mapped: 23
+  phases_completed: 3
   total_phases: 3
 
 ## Current Position
 
-Phase: 03 — COMPLETE
-Plan: 1 of 4
-Status: Phase 03 complete
-Last activity: 2026-06-13 -- Phase 03 marked complete
+Milestone: v1.0 — READY TO CLOSE
+Status: all_gaps_closed
+Last activity: 2026-06-13 -- Milestone v1.0 ready to close
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-05-29)
 
 **Core value:** Transparência pública sobre a atividade parlamentar, permitindo que cidadãos fiscalizem seus representantes com base em dados oficiais e verificáveis.
-**Current focus:** Phase 03 — intelligence
+**Current status:** All 3 phases complete, all 23 requirements satisfied. Ready to close v1.0 milestone.
 
 ## Accumulated Context
 
-### Key Decisions from Phase 1
+### Key Decisions across all Phases
 
+**Phase 1:**
 - `relationship_type` (Boolean) added to Relacao model: `False=cpf_match`, `True=nome_match`
 - Dual strategy matching: exact CPF first, then rapidfuzz fuzzy name matching (threshold: 75)
 - QSA ingestion via background task (`POST /atualizar-qsa`) with chunked CSV processing (10k rows)
 - CNPJ validation with checksum verification, failures logged via `logging.warning`
-- 50 test cases across 5 test files covering all Phase 1 requirements
+- 86 test cases across 6 test files covering all requirements
 - Test infrastructure: in-memory SQLite via conftest.py with dependency override
+
+**Phase 2:**
+- Idempotent DDL migration using inspect(engine).get_columns() for column existence checks
+- QsaMetadata follows SyncLog pattern from votacao.py
+- Config model as generic key/value configuration table
+- Incremental upsert uses sqlalchemy.dialects.sqlite.insert with on_conflict_do_update
+- Confidence score keeps discrete tier system (85/60/0)
+
+**Phase 3:**
+- 3-factor graduated conflict scoring: capital (50pts) + CNAE (30pts) + CPF (20pts)
+- Secondary CNAE parsing from semicolon-separated field
+- CNAE conflict classes seeded in Config: 41204, 70204, 73190, 86101
 
 ### Blockers
 
-- Nenhum blocker identificado
+None — all gaps closed.
 
 ### Todos
 
-- Próximo passo: Executar Phase 3 (Intelligence — Conflict Detection and UX)
-  - Wave 1: Data Model (03-01-PLAN.md)
-  - Wave 2: Import Pipeline (03-02) + Detection Service (03-03)
-  - Wave 3: API Updates (03-04-PLAN.md)
-
-EOF
+- [x] Fix INF-01: Create docker-compose.yml + Backend Dockerfile
+- [x] File 02-04-SUMMARY.md
+- [x] Update REQUIREMENTS.md traceability checkboxes
+- [ ] Add requirements-completed frontmatter to Phase 1 and 3 SUMMARYs
+- [ ] Create Phase 3 VALIDATION.md (Nyquist)
+- [ ] Create VERIFICATION.md for all 3 phases (deferred — backlog)

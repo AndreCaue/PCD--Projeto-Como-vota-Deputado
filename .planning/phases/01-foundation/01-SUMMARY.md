@@ -3,6 +3,12 @@ plan: 01
 phase: 01
 status: complete
 wave: 0
+requirements-completed:
+  - MAT-01
+  - MAT-03
+  - MAT-04
+  - DQ-02
+  - DQ-03
 ---
 
 # Plan 01: Foundation - Test Suite Creation

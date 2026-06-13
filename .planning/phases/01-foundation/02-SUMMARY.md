@@ -3,6 +3,18 @@ plan: 02
 phase: 01
 status: complete
 wave: 1
+requirements-completed:
+  - ING-01
+  - ING-02
+  - ING-03
+  - MAT-01
+  - MAT-03
+  - MAT-04
+  - API-01
+  - API-03
+  - INF-03
+  - DQ-02
+  - DQ-03
 ---
 
 # Plan 02: Foundation - Data Ingestion and Matching Implementation
