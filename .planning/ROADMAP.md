@@ -4,7 +4,7 @@
 
 - [x] **Phase 1: Foundation** - Data Ingestion and Matching
 - [x] **Phase 2: Enhancement** - Matching Refinement and Data Quality
-- [ ] **Phase 3: Intelligence** - Conflict Detection and UX
+- [x] **Phase 3: Intelligence** - Conflict Detection and UX
 
 ## Phase Details
 
@@ -62,7 +62,21 @@ Plans:
   3. System identifies high exposure relationships where capital_social > 1,000,000 and marks them in API responses
   4. System tracks and returns whether deputy-company relationship was found via spouse name matching (via_conjuge flag)
 
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+**Wave 1**
+
+- [x] 03-01-PLAN.md — Data Model Extensions: CNAE Columns + Conflict Flags + Schema Migration + Tests
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [x] 03-02-PLAN.md — CNAE Import Pipeline: CSV Capture + Secondary CNAE Parsing + Config Seed
+- [x] 03-03-PLAN.md — Conflict Detection Service: CNAE Matching + Graduated Scoring
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [x] 03-04-PLAN.md — API Updates: Conflict Flags in All Endpoints + Refined Filters + Tests
 
 ## Progress Table
 
@@ -70,4 +84,4 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | ✅ Complete | 2026-06-11 |
 | 2. Enhancement | 4/4 | ✅ Complete | 2026-06-12 |
-| 3. Intelligence | 0/4 | Not started | - |
+| 3. Intelligence | 4/4 | ✅ Complete | 2026-06-13 |
