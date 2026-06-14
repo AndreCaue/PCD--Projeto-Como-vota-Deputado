@@ -1,96 +1,100 @@
-# Requirements: Fiscalização de Parlamentares (FdP) - QSA Integration
+# Requirements: Fiscalização de Parlamentares (FdP)
 
-**Defined:** 2026-05-29
+**Defined:** 2026-06-13
 **Core Value:** Transparência pública sobre a atividade parlamentar, permitindo que cidadãos fiscalizem seus representantes com base em dados oficiais e verificáveis.
 
-## v1 Requirements
+## v1.1 Requirements
 
-### Data Ingestion
-- [x] **ING-01**: System automatically downloads and processes Empresas.zip and Socios.zip from Receita Federal QSA dataset
-- [x] **ING-02**: System extracts and loads CNPJ data into SQLite database without intermediate disk storage
-- [x] **ING-03**: System handles ZIP file validation and error recovery during ingestion process
+Requirements for v1.1 (Frontend QSA + Cleanup). Maps to roadmap phases 4-6.
 
-### Deputado-Company Matching
-- [x] **MAT-01**: System matches deputies to companies via exact CPF comparison (deputado CPF → socio CPF/CNPJ)
-- [x] **MAT-02**: System matches deputies' spouses to company partners using fuzzy name matching when CPF unavailable
-- [x] **MAT-03**: System combines exact CPF matching and fuzzy name matching in a dual strategy approach
-- [x] **MAT-04**: System validates CNPJ format and checksum digits during data processing
+### Cleanup & Foundation
 
-### Conflict Detection
-- [x] **CONF-01**: System flags companies with CNAE codes in consultoria, construção, publicidade, saúde sectors as potential conflicts
-- [x] **CONF-02**: System calculates graduated conflict confidence levels based on multiple factors (CNAE, capital, relationship type)
-- [x] **CONF-03**: System identifies high exposure relationships where capital_social > 1,000,000
-- [x] **CONF-04**: System tracks relationships found via spouse name matching (via_conjuge flag)
+- [ ] **CLEANUP-01**: Fix `processar_csv_socios()` missing `return total` in Backend — DQ-01 blocker bug
+- [ ] **CLEANUP-02**: Change Frontend/api.ts fallback port from 8000 to 3001
+- [ ] **CLEANUP-03**: Replace all `datetime.utcnow()` with `datetime.now(timezone.utc)` across backend
+- [ ] **CLEANUP-04**: Remove dead code (import_empresas.py, import_socios.py, unused import_qsa_completo references)
+- [ ] **CLEANUP-05**: Create QSA service layer in Frontend/services/api.ts (qsaService with all endpoints)
+- [ ] **CLEANUP-06**: Add VERIFICATION.md for all 3 v1.0 phases (Nyquist compliance)
 
-### API Endpoints
-- [x] **API-01**: GET /deputados/{deputado_id}/empresas returns list of companies for a specific deputy with match details
-- [x] **API-02**: GET /deputados/empresas returns paginated list of all deputies with company counts and conflict flags
-- [x] **API-03**: POST /atualizar-qsa triggers manual QSA data ingestion process
-- [x] **API-04**: API responses include data freshness indicators and match confidence scores
+### QSA Dashboard Core
 
-### Infrastructure
-- [x] **INF-01**: System provides Dockerfile and docker-compose.yml for consistent deployment
-- [x] **INF-02**: System implements incremental processing for weekly QSA updates
-- [x] **INF-03**: System maintains 100% offline operation after initial data ingestion
-- [x] **INF-04**: System creates appropriate database indices for efficient querying of large datasets
+- [ ] **QSA-01**: Build `/fiscalizacao` route with full relationship list and pagination
+- [ ] **QSA-02**: QsaRelationshipCard — display company info, CNPJ, CNAE, capital social with expandable details
+- [ ] **QSA-03**: Conflict of Interest badge (red/green) per relationship with tooltip explaining score
+- [ ] **QSA-04**: Financial Exposure indicator — highlight `alta_exposicao` relationships, show capital values
+- [ ] **QSA-05**: MatchTypeBadge — show CPF (green) vs Nome (amber) match type with tooltip
+- [ ] **QSA-06**: FreshnessBanner — show data staleness at page top (green/amber/red)
+- [ ] **QSA-07**: SpouseDisclosure — distinct indicator when `via_conjuge` with info tooltip
+- [ ] **QSA-08**: QsaSummaryCards — aggregate stats (total, conflito, exposicao, conjuge)
+- [ ] **QSA-09**: QsaFilterBar — filter by conflict, exposure, spouse; sort by score/capital/name
+- [ ] **QSA-10**: Add QSA inline section to existing deputado profile page
+- [ ] **QSA-11**: Empty state ("Nenhuma relação encontrada") and error state ("Erro ao carregar") with retry
+- [ ] **QSA-12**: Score breakdown visualization — CSS-only 50/30/20 segmented bar with legend
+- [ ] **QSA-13**: CNAE category labels — map raw CNAE codes to human-readable risk categories
+- [ ] **QSA-14**: Mobile responsive layout for QSA pages
 
-### Data Quality
-- [x] **DQ-01**: System tracks data vintage and provides freshness indicators in API responses
-- [x] **DQ-02**: System implements CNPJ normalization (stripping non-numeric characters) and validation
-- [x] **DQ-03**: System logs data quality issues and validation failures during ingestion
-- [x] **DQ-04**: System provides staleness alerts for data older than 45 days
+### Compliance & Polish
+
+- [ ] **DOCS-01**: Create VALIDATION.md for all 3 v1.0 phases (Nyquist compliance)
+- [ ] **DOCS-02**: Add nav link to `/fiscalizacao` in shared navigation
+- [ ] **DOCS-03**: Add score interpretation disclaimer on all score displays
+- [ ] **DOCS-04**: Ensure Docker compose wires backend service correctly
 
 ## v2 Requirements
 
-### Advanced Analytics
-- [ ] **SECTOR-01**: Sector-specific risk scoring based on deputy committee assignments
-- [ ] **HISTORY-01**: Historical tracking of deputy-company relationships for trend analysis
-- [ ] **EXPORT-01**: Export functionality for reports in CSV/JSON formats
-- [ ] **INVESTIGATE-01**: Interactive conflict investigation UI with detailed relationship tracing
+Deferred to future release.
+
+### Features
+
+- **QSA-XX**: Company-to-deputado reverse lookup page
+- **QSA-XX**: Network graph visualization of QSA relationships
+- **QSA-XX**: Historical trend view of QSA changes
+- **QSA-XX**: Bulk CSV export of QSA data
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Real-time API calls to Receita Federal | Would violate offline operation requirement and create dependency on external service |
-| Manual file upload interface | Automatic ingestion is core to the milestone; manual upload would complicate UX |
-| Machine learning prediction models | Would add complexity beyond scope of basic conflict detection |
-| Mobile application native | Focus remains on web-responsive experience per existing constraints |
-| OAuth/LDAP authentication systems | Email/password sufficient for initial scope; federated identity not required |
+| Real-time data refresh / push notifications | QSA data is inherently batch-updated from Receita Federal; websocket infra is overkill |
+| Interactive network graph | High complexity, separate page scope; defer to v1.2+ |
+| Automated conflict alerts / email subscriptions | Requires auth system and email infra; on-page indicators suffice |
+| Full CNPJ detail page (tax info, subsidiaries) | Project focuses on parliamentarian-business links, not full company intelligence |
+| Auth-based user system | Not in scope for transparency tool; all data is public |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ING-01 | Phase 1 | Complete |
-| ING-02 | Phase 1 | Complete |
-| ING-03 | Phase 1 | Complete |
-| MAT-01 | Phase 1 | Complete |
-| MAT-02 | Phase 2 | Complete |
-| MAT-03 | Phase 1 | Complete |
-| MAT-04 | Phase 1 | Complete |
-| CONF-01 | Phase 3 | Complete |
-| CONF-02 | Phase 3 | Complete |
-| CONF-03 | Phase 2 | Complete |
-| CONF-04 | Phase 2 | Complete |
-| API-01 | Phase 1 | Complete |
-| API-02 | Phase 2 | Complete |
-| API-03 | Phase 1 | Complete |
-| API-04 | Phase 2 | Complete |
-| INF-01 | Phase 1 | Complete |
-| INF-02 | Phase 2 | Complete |
-| INF-03 | Phase 1 | Complete |
-| INF-04 | Phase 2 | Complete |
-| DQ-01 | Phase 2 | Complete |
-| DQ-02 | Phase 1 | Complete |
-| DQ-03 | Phase 1 | Complete |
-| DQ-04 | Phase 2 | Complete |
+| CLEANUP-01 | Phase 4 | Pending |
+| CLEANUP-02 | Phase 4 | Pending |
+| CLEANUP-03 | Phase 4 | Pending |
+| CLEANUP-04 | Phase 4 | Pending |
+| CLEANUP-05 | Phase 4 | Pending |
+| CLEANUP-06 | Phase 4 | Pending |
+| QSA-01 | Phase 5 | Pending |
+| QSA-02 | Phase 5 | Pending |
+| QSA-03 | Phase 5 | Pending |
+| QSA-04 | Phase 5 | Pending |
+| QSA-05 | Phase 5 | Pending |
+| QSA-06 | Phase 5 | Pending |
+| QSA-07 | Phase 5 | Pending |
+| QSA-08 | Phase 5 | Pending |
+| QSA-09 | Phase 5 | Pending |
+| QSA-10 | Phase 5 | Pending |
+| QSA-11 | Phase 5 | Pending |
+| QSA-12 | Phase 6 | Pending |
+| QSA-13 | Phase 6 | Pending |
+| QSA-14 | Phase 6 | Pending |
+| DOCS-01 | Phase 6 | Pending |
+| DOCS-02 | Phase 6 | Pending |
+| DOCS-03 | Phase 6 | Pending |
+| DOCS-04 | Phase 6 | Pending |
 
 **Coverage:**
-- v1 requirements: 23 total
-- Mapped to phases: 20
+- v1.1 requirements: 24 total
+- Mapped to phases: 24
 - Unmapped: 0 ✓
 
 ---
-*Requirements defined: 2026-05-29*
-*Last updated: 2026-05-29 after initial definition*
+*Requirements defined: 2026-06-13*
+*Last updated: 2026-06-13 after v1.1 milestone definition*
