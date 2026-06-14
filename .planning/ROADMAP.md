@@ -65,7 +65,11 @@
   3. Backend runs without deprecation warnings — zero `datetime.utcnow()` calls remain
   4. QSA service layer exists in frontend — hooks use `qsaService` with axios, not raw `fetch()`
   5. VERIFICATION.md exists for all 3 v1.0 phases — Nyquist compliance artifact present
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 04-01-PLAN.md — Backend bugfix & dead code cleanup (datetime.utcnow, regression test, dead code removal)
+- [ ] 04-02-PLAN.md — Frontend port fix & QSA service layer (qsaService, axios migration)
+- [ ] 04-03-PLAN.md — VERIFICATION.md creation for phases 1-3 (Nyquist compliance)
 
 ### Phase 5: QSA Dashboard Core
 **Goal**: Users can visualize, inspect, and filter deputy-company relationships with full context
@@ -104,6 +108,6 @@
 | 1. Foundation | v1.0 | 2/2 | ✅ Complete | 2026-06-11 |
 | 2. Enhancement | v1.0 | 4/4 | ✅ Complete | 2026-06-12 |
 | 3. Intelligence | v1.0 | 4/4 | ✅ Complete | 2026-06-13 |
-| 4. Cleanup & Foundation | v1.1 | 0/0 | Not started | - |
+| 4. Cleanup & Foundation | v1.1 | 0/3 | Planning | - |
 | 5. QSA Dashboard Core | v1.1 | 0/0 | Not started | - |
 | 6. Polish & Compliance | v1.1 | 0/0 | Not started | - |
