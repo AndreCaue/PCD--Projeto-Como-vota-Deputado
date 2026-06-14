@@ -218,3 +218,55 @@ export const patrimonioService = {
       .get("/api/v1/patrimonio/top-variacao", { params: { limit } })
       .then((r) => r.data),
 };
+
+export interface QsaFreshness {
+  qsa_data_disponivel: boolean;
+  ultima_atualizacao_qsa?: string;
+  dias_desde_atualizacao?: number;
+  dados_antigos?: boolean;
+}
+
+export interface DeputadoEmpresa {
+  id: string;
+  nome: string;
+  partido: string;
+  estado: string;
+  total_empresas: number;
+  total_conflito: number;
+}
+
+export interface RelacaoDetalhada {
+  id: number;
+  cnpj: string;
+  tipo_relacao: string;
+  relationship_type: boolean | null;
+  score_confianca: number;
+  score_conflito: number;
+  conflito_interesse: boolean;
+  alta_exposicao: boolean;
+  via_conjuge: boolean;
+  empresa: {
+    razao_social: string;
+    municipio: string | null;
+    capital_social: number | null;
+    cnae_principal: string | null;
+    cnae_descricao: string | null;
+  };
+}
+
+export const qsaService = {
+  listar: (params?: Record<string, unknown>) =>
+    api.get("/deputados/empresas", { params }).then((r) => r.data),
+
+  freshness: () =>
+    api.get<QsaFreshness>("/qsa/freshness").then((r) => r.data),
+
+  relacoes: (deputadoId: string) =>
+    api.get<RelacaoDetalhada[]>(`/deputados/${deputadoId}/relacoes`).then((r) => r.data),
+
+  empresas: (deputadoId: string, params?: { page?: number; limit?: number }) =>
+    api.get(`/deputados/${deputadoId}/empresas`, { params }).then((r) => r.data),
+
+  atualizar: () =>
+    api.post("/atualizar-qsa").then((r) => r.data),
+};
