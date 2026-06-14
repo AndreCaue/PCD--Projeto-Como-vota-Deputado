@@ -64,12 +64,12 @@ def list_deputados_empresas(
     rows = query.offset((page - 1) * limit).limit(limit).all()
 
     from ..models.qsa_metadata import QsaMetadata
-    from datetime import datetime
+    from datetime import datetime, timezone
     meta = db.query(QsaMetadata).order_by(
         QsaMetadata.last_import_at.desc()).first()
     freshness = {}
     if meta:
-        days_stale = (datetime.utcnow() - meta.last_import_at).days
+        days_stale = (datetime.now(timezone.utc) - meta.last_import_at.replace(tzinfo=timezone.utc)).days
         freshness = {
             "qsa_data_disponivel": True,
             "ultima_atualizacao_qsa": meta.last_import_at.isoformat(),
@@ -164,13 +164,13 @@ def get_empresas_deputado(
         service.gerar_relacoes_deputado(id)
         rels = service.get_relacoes_com_detalhes(id)
     from ..models.qsa_metadata import QsaMetadata
-    from datetime import datetime
+    from datetime import datetime, timezone
     meta = db.query(QsaMetadata).order_by(
         QsaMetadata.last_import_at.desc()).first()
     if not meta:
         freshness = {"qsa_data_disponivel": False}
     else:
-        days_stale = (datetime.utcnow() - meta.last_import_at).days
+        days_stale = (datetime.now(timezone.utc) - meta.last_import_at.replace(tzinfo=timezone.utc)).days
         freshness = {
             "qsa_data_disponivel": True,
             "ultima_atualizacao_qsa": meta.last_import_at.isoformat(),

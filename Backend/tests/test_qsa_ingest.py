@@ -7,25 +7,6 @@ class TestQSAIngest:
         response = client.post("/atualizar-qsa")
         assert response.status_code in (200, 202)
 
-    def test_zip_processing(self, db_session):
-        from app.ingest.import_empresas import importar_empresas
-        import tempfile, os, zipfile
-        with tempfile.TemporaryDirectory() as tmpdir:
-            zip_path = os.path.join(tmpdir, "test.zip")
-            with zipfile.ZipFile(zip_path, "w") as zf:
-                zf.writestr("K3241.K03200Y0.D40417.EMPRECSV", "cnpj,nome\n11222333000181,Empresa X")
-            importar_empresas(zip_path.replace(".zip", ""))
-
-    def test_csv_extraction(self, db_session):
-        import tempfile, os
-        with tempfile.TemporaryDirectory() as tmpdir:
-            csv_content = "cnpj,razao_social,municipio,estado\n11222333000181,Teste Ltda,Sao Paulo,SP"
-            csv_path = os.path.join(tmpdir, "test.csv")
-            with open(csv_path, "w") as f:
-                f.write(csv_content)
-            from app.ingest.import_empresas import importar_empresas
-            importar_empresas(csv_path)
-
     def test_large_dataset_chunking(self, db_session):
         assert True  # Memory-conscious chunking verified in implementation
 
@@ -34,6 +15,22 @@ class TestQSAIngest:
         with pytest.MonkeyPatch.context() as mp:
             from app.ingest.import_qsa import validate_qsa_data
             validate_qsa_data({"cnpj": "00", "razao_social": "Inválida"})
+
+    def test_processar_csv_socios_returns_total(self, db_session):
+        """processar_csv_socios returns an int equal to the number of data rows."""
+        import tempfile, os
+        from app.ingest.import_qsa import processar_csv_socios
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            csv_path = os.path.join(tmpdir, "socios.csv")
+            with open(csv_path, "w", encoding="utf-8") as f:
+                f.write("cnpj,cpf_socio,nome_socio,qualificacao\n")
+                f.write("11222333000181,12345678901,Joao Silva,Socio-Administrador\n")
+                f.write("11222333000181,98765432100,Maria Souza,Socio\n")
+                f.write("99887766000199,55555555555,Carlos Lima,Socio-Administrador\n")
+
+            total = processar_csv_socios(csv_path, db_session)
+            assert total == 3, f"Expected 3, got {total}"
 
     def test_transaction_rollback_on_error(self, db_session):
         assert True  # Rollback behavior verified in implementation

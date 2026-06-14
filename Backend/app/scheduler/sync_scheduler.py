@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 from ..database import SessionLocal
 from ..services.integracao_service import IntegracaoService
@@ -43,7 +43,7 @@ async def check_qsa_freshness():
         metadata = db.query(QsaMetadata).order_by(
             QsaMetadata.last_import_at.desc()).first()
         if metadata:
-            days_stale = (datetime.utcnow() - metadata.last_import_at).days
+            days_stale = (datetime.now(timezone.utc) - metadata.last_import_at.replace(tzinfo=timezone.utc)).days
             if days_stale > 7:
                 logger.info(
                     "QSA data %d dias desatualizada — acionando atualização incremental",

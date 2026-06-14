@@ -2,7 +2,7 @@ import os
 import zipfile
 import tempfile
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 import pandas as pd
 import httpx
 from sqlalchemy.orm import Session
@@ -184,7 +184,7 @@ def importar_qsa_incremental():
                     socio_total = processar_csv_socios(csv_path, db)
         from ..models.qsa_metadata import QsaMetadata
         meta = QsaMetadata(
-            last_import_at=datetime.utcnow(),
+            last_import_at=datetime.now(timezone.utc),
             status="success",
             row_count=empresa_total + socio_total
         )
@@ -197,7 +197,7 @@ def importar_qsa_incremental():
         try:
             from ..models.qsa_metadata import QsaMetadata
             meta = QsaMetadata(
-                last_import_at=datetime.utcnow(),
+                last_import_at=datetime.now(timezone.utc),
                 status="failed",
                 row_count=0,
                 error_message=str(e)
@@ -235,24 +235,3 @@ def extrair_csvs(zip_path: str, dest_dir: str) -> list:
                 csv_paths.append(os.path.join(dest_dir, name))
     return csv_paths
 
-
-def importar_qsa_completo():
-    db = SessionLocal()
-    tmp = tempfile.TemporaryDirectory()
-    try:
-        logger.info("Iniciando importação QSA completa...")
-        zips = baixar_qsa(tmp.name)
-        for nome, zip_path in zips.items():
-            csvs = extrair_csvs(zip_path, tmp.name)
-            for csv_path in csvs:
-                if "EMPRECSV" in csv_path.upper() or "empres" in nome.lower():
-                    processar_csv_empresas(csv_path, db)
-                elif "SOCIOCSV" in csv_path.upper() or "soci" in nome.lower():
-                    processar_csv_socios(csv_path, db)
-        logger.info("Importação QSA concluída com sucesso!")
-    except Exception as e:
-        logger.error("Erro na importação QSA: %s", e)
-        db.rollback()
-    finally:
-        db.close()
-        tmp.cleanup()

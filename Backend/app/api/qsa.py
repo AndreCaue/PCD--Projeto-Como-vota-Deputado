@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, timezone
 from ..database import get_db
 from ..models.qsa_metadata import QsaMetadata
 
@@ -13,7 +13,7 @@ def get_qsa_freshness(db: Session = Depends(get_db)):
         QsaMetadata.last_import_at.desc()).first()
     if not meta:
         return {"qsa_data_disponivel": False}
-    days_stale = (datetime.utcnow() - meta.last_import_at).days
+    days_stale = (datetime.now(timezone.utc) - meta.last_import_at.replace(tzinfo=timezone.utc)).days
     return {
         "qsa_data_disponivel": True,
         "ultima_atualizacao_qsa": meta.last_import_at.isoformat(),
