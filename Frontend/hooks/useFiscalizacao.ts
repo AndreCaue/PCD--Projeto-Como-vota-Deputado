@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api/v1";
+import { api } from "@/services/api";
 
 export interface Alerta {
   id: number;
@@ -71,20 +69,14 @@ export interface EvolucaoMensal {
   total: number;
 }
 
-async function fetchJSON<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, { next: { revalidate: 300 } });
-  if (!res.ok) throw new Error(`${res.status} ${path}`);
-  return res.json();
-}
-
 export function useAlertas(deputadoId: string) {
   const [data, setData] = useState<Alerta[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchJSON<Alerta[]>(`/irregularidades/${deputadoId}/alertas`)
-      .then(setData)
+    api.get<Alerta[]>(`/api/v1/irregularidades/${deputadoId}/alertas`)
+      .then((r) => setData(r.data))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [deputadoId]);
@@ -98,8 +90,8 @@ export function useEvolucaoPatrimonio(deputadoId: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchJSON<EvolucaoPatrimonio>(`/patrimonio/${deputadoId}/evolucao`)
-      .then(setData)
+    api.get<EvolucaoPatrimonio>(`/api/v1/patrimonio/${deputadoId}/evolucao`)
+      .then((r) => setData(r.data))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [deputadoId]);
@@ -113,8 +105,8 @@ export function useResumoCEAP(deputadoId: string, ano: number) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchJSON<ResumoCEAP>(`/ceap/${deputadoId}/resumo?ano=${ano}`)
-      .then(setData)
+    api.get<ResumoCEAP>(`/api/v1/ceap/${deputadoId}/resumo`, { params: { ano } })
+      .then((r) => setData(r.data))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [deputadoId, ano]);
@@ -127,8 +119,8 @@ export function useEvolucaoMensal(deputadoId: string, ano: number) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchJSON<EvolucaoMensal[]>(`/ceap/${deputadoId}/mensal?ano=${ano}`)
-      .then(setData)
+    api.get<EvolucaoMensal[]>(`/api/v1/ceap/${deputadoId}/mensal`, { params: { ano } })
+      .then((r) => setData(r.data))
       .catch(() => setData(null))
       .finally(() => setLoading(false));
   }, [deputadoId, ano]);
@@ -148,15 +140,11 @@ export function useCruzamento(
     setLoading(true);
     setError(null);
     try {
-      const query = anos.map((a) => `anos_ceap=${a}`).join("&");
-      const res = await fetch(
-        `${API_BASE}/irregularidades/${deputadoId}/analisar?${query}`,
-        {
-          method: "POST",
-        },
+      const params = anos.map((a) => `anos_ceap=${a}`).join("&");
+      const res = await api.post<CruzamentoResult>(
+        `/api/v1/irregularidades/${deputadoId}/analisar?${params}`,
       );
-      if (!res.ok) throw new Error(`${res.status}`);
-      setData(await res.json());
+      setData(res.data);
     } catch (e: any) {
       setError(e.message);
     } finally {
