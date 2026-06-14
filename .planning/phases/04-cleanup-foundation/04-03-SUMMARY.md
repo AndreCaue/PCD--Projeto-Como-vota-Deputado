@@ -99,6 +99,15 @@ None — documentation-only phase with no code changes, no network, no new depen
 - Phase 4 plans 04-01 (backend bugfix) and 04-02 (frontend port fix + QSA service layer) remain
 - Phase 4 is ready for next plan execution
 
+## Self-Check: PASSED
+
+- [x] .planning/phases/01-foundation/01-VERIFICATION.md exists with all Phase 1 requirements mapped
+- [x] .planning/phases/02-enhancement/02-VERIFICATION.md exists with all Phase 2 requirements mapped
+- [x] .planning/phases/03-intelligence/03-VERIFICATION.md exists with all Phase 3 requirements mapped
+- [x] Each file includes Requirements Summary, Test Evidence, UAT Evidence, Requirement-by-Requirement Mapping, and Known Gaps
+- [x] Known gaps reference deferred work (Phase 6 plan items)
+- [x] All 4 commits present in git log
+
 ---
 
 *Phase: 04-cleanup-foundation*
