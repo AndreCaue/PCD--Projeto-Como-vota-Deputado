@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: audit_complete
-last_updated: "2026-06-13"
-last_activity: 2026-06-13 -- Milestone v1.0 audit complete
+milestone: v1.1
+milestone_name: Frontend QSA + Cleanup
+status: planning
+last_updated: "2026-06-14T00:24:37.496Z"
+last_activity: 2026-06-14
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 11
-  completed_plans: 11
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 ---
@@ -25,9 +25,10 @@ progress:
 
 ## Current Position
 
-Milestone: v1.0 — READY TO CLOSE
-Status: all_gaps_closed
-Last activity: 2026-06-13 -- Milestone v1.0 ready to close
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-06-14 — Milestone v1.1 started
 
 ## Project Reference
 
@@ -41,6 +42,7 @@ See: .planning/PROJECT.md (updated 2026-05-29)
 ### Key Decisions across all Phases
 
 **Phase 1:**
+
 - `relationship_type` (Boolean) added to Relacao model: `False=cpf_match`, `True=nome_match`
 - Dual strategy matching: exact CPF first, then rapidfuzz fuzzy name matching (threshold: 75)
 - QSA ingestion via background task (`POST /atualizar-qsa`) with chunked CSV processing (10k rows)
@@ -49,6 +51,7 @@ See: .planning/PROJECT.md (updated 2026-05-29)
 - Test infrastructure: in-memory SQLite via conftest.py with dependency override
 
 **Phase 2:**
+
 - Idempotent DDL migration using inspect(engine).get_columns() for column existence checks
 - QsaMetadata follows SyncLog pattern from votacao.py
 - Config model as generic key/value configuration table
@@ -56,6 +59,7 @@ See: .planning/PROJECT.md (updated 2026-05-29)
 - Confidence score keeps discrete tier system (85/60/0)
 
 **Phase 3:**
+
 - 3-factor graduated conflict scoring: capital (50pts) + CNAE (30pts) + CPF (20pts)
 - Secondary CNAE parsing from semicolon-separated field
 - CNAE conflict classes seeded in Config: 41204, 70204, 73190, 86101

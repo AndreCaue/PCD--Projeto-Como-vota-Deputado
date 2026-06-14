@@ -21,7 +21,12 @@ Transparência pública sobre a atividade parlamentar, permitindo que cidadãos 
 
 ### Active
 
-<!-- Current scope for next milestone -->
+- [ ] Full QSA dashboard page — deputy-company relationships, conflict flags, freshness indicators
+- [ ] VERIFICATION.md for all 3 v1.0 phases (Nyquist compliance)
+- [ ] VALIDATION.md for all 3 v1.0 phases (Nyquist compliance)
+- [ ] Fix datetime.utcnow() deprecation across 6 files
+- [ ] Remove dead import_qsa_completo code
+- [ ] Fix Frontend/api.ts fallback URL port 8000 → 3001
 
 ### Out of Scope
 
@@ -61,15 +66,34 @@ Transparência pública sobre a atividade parlamentar, permitindo que cidadãos 
 | 3-factor scoring: capital(50) + CNAE(30) + CPF(20) | Modelo graduado simples | ✓ Good |
 | Inline freshness in API responses | Sem endpoint separado | ✓ Good |
 
-## Next Milestone Goals
+## Current Milestone: v1.1 — Frontend QSA + Cleanup
 
-v1.0 delivered the complete QSA backend. The next milestone should focus on:
-- Frontend UI for QSA data, conflict flags, and freshness indicators
-- VERIFICATION.md and VALIDATION.md for all phases (Nyquist compliance)
+**Goal:** Build QSA frontend visualization and fix accumulated tech debt
+
+**Target features:**
+- Full QSA dashboard page (deputy-company relationships, conflict flags, freshness indicators)
+- Nyquist compliance: VERIFICATION.md and VALIDATION.md for all phases
 - Fix datetime.utcnow() deprecation across 6 files
-- Clean up dead code (import_qsa_completo)
-- Fix Frontend/api.ts fallback URL port (8000 → 3001)
+- Remove dead import_qsa_completo code
+- Fix Frontend/api.ts fallback URL port 8000 → 3001
+
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition:**
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone:**
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
 
 ---
 
-*Last updated: 2026-06-13 after v1.0 milestone*
+*Last updated: 2026-06-13 after v1.1 milestone start*
