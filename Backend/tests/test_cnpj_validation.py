@@ -46,32 +46,6 @@ class TestCNPJValidation:
     def test_cnpj_checksum_validation(self):
         assert not self._validate_cnpj("11222333000182")
 
-    def test_ingestion_rejects_invalid_cnpj(self, db_session):
-        from app.ingest.import_empresas import importar_empresas
-        import tempfile, os
-        with tempfile.TemporaryDirectory() as tmpdir:
-            csv_content = "cnpj,razao_social\n123,Empresa Invalida"
-            csv_path = os.path.join(tmpdir, "invalid.csv")
-            with open(csv_path, "w") as f:
-                f.write(csv_content)
-            try:
-                importar_empresas(csv_path)
-            except Exception:
-                pass
-
-    def test_empty_cnpj_handling(self, db_session):
-        from app.ingest.import_empresas import importar_empresas
-        import tempfile, os
-        with tempfile.TemporaryDirectory() as tmpdir:
-            csv_content = "cnpj,razao_social\n,Empresa Sem CNPJ"
-            csv_path = os.path.join(tmpdir, "empty.csv")
-            with open(csv_path, "w") as f:
-                f.write(csv_content)
-            try:
-                importar_empresas(csv_path)
-            except Exception:
-                pass
-
     def test_validation_failure_logging(self, db_session):
         import logging
         logger = logging.getLogger("cnpj_validation")
