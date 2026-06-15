@@ -11,7 +11,7 @@
 - [x] **Phase 2: Enhancement** — Matching refinement, incremental processing, freshness — *shipped v1.0*
 - [x] **Phase 3: Intelligence** — Conflict detection, scoring, CNAE analysis — *shipped v1.0*
 - [ ] **Phase 4: Cleanup & Foundation** — Fix blockers, tech debt cleanup, QSA service layer, VERIFICATION.md
-- [ ] **Phase 5: QSA Dashboard Core** — /fiscalizacao route, relationship cards, badges, filters, deputado profile section
+- [x] **Phase 5: QSA Dashboard Core** — /fiscalizacao route, relationship cards, badges, filters, deputado profile section
 - [ ] **Phase 6: Polish & Compliance** — Score viz, CNAE labels, mobile responsive, VALIDATION.md, Docker wiring
 
 ## Phase Details
@@ -87,10 +87,11 @@ Plans:
 **Plans**: 4 plans (2 waves)
 **UI hint**: yes
 Plans:
-- [ ] 05-01-PLAN.md — Backend API enhancements (sort, spouse filter, aggregate counts) + types update
-- [ ] 05-02-PLAN.md — Core display components (badges, indicators, states, tooltip, barrel)
-- [ ] 05-03-PLAN.md — Main /fiscalizacao dashboard page (cards, summary, filter, pagination)
-- [ ] 05-04-PLAN.md — QSA inline section on deputy profile + nav link
+- [x] 05-01-PLAN.md — Backend API enhancements (sort, spouse filter, aggregate counts) + types update
+- [x] 05-02-PLAN.md — Core display components (badges, indicators, states, tooltip, barrel)
+- [x] 05-03-PLAN.md — Main /fiscalizacao dashboard page (cards, summary, filter, pagination)
+- [x] 05-04-PLAN.md — QSA inline section on deputy profile + nav link
+**Completed**: 2026-06-15
 
 ### Phase 6: Polish & Compliance
 **Goal**: Polish edge cases, add compliance documentation, ensure mobile readiness and score transparency
@@ -104,8 +105,13 @@ Plans:
   5. User can navigate to `/fiscalizacao` from the app's main navigation
   6. VALIDATION.md exists for all 3 v1.0 phases — Nyquist compliance artifact present
   7. Docker compose correctly wires backend service
-**Plans**: TBD
+**Plans**: 4/4 complete
 **UI hint**: yes
+Plans:
+- [ ] 06-01-PLAN.md — Score visualization (CSS breakdown bar, legend, interpretation disclaimer)
+- [ ] 06-02-PLAN.md — CNAE labels (human-readable labels from seeded mapping)
+- [ ] 06-03-PLAN.md — Mobile responsiveness (responsive layout for QSA pages)
+- [ ] 06-04-PLAN.md — Docker wiring + VALIDATION.md for phases 1-3
 
 ## Progress
 
@@ -115,5 +121,5 @@ Plans:
 | 2. Enhancement | v1.0 | 4/4 | ✅ Complete | 2026-06-12 |
 | 3. Intelligence | v1.0 | 4/4 | ✅ Complete | 2026-06-13 |
 | 4. Cleanup & Foundation | v1.1 | 3/3 | ✅ Complete | 2026-06-14 |
-| 5. QSA Dashboard Core | v1.1 | 0/4 | In planning | - |
+| 5. QSA Dashboard Core | v1.1 | 4/4 | ✅ Complete | 2026-06-15 |
 | 6. Polish & Compliance | v1.1 | 0/0 | Not started | - |
