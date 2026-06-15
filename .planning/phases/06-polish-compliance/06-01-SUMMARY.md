@@ -122,5 +122,17 @@ None - no new network endpoints, auth paths, or trust-boundary surface introduce
 
 ---
 
+## Self-Check: PASSED
+
+- ScoreBreakdownBar.tsx ✅ exists
+- CnaeLabel.tsx ✅ exists
+- 819bf20 ✅ feat(06-01): create components
+- 14a01c6 ✅ feat(06-01): integrate into QsaRelationshipCard
+- 3553d92 ✅ feat(06-01): add to QsaInlineSection
+- c231d77 ✅ docs(06-01): SUMMARY.md
+- index.tsx ✅ exports both components
+- QsaRelationshipCard.tsx ✅ imports and renders both
+- QsaInlineSection.tsx ✅ imports and renders CnaeLabel
+
 *Phase: 06-polish-compliance*
 *Completed: 2026-06-15*
