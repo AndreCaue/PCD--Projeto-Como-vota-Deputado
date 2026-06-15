@@ -8,6 +8,8 @@ import { ConflictBadge } from "./ConflictBadge";
 import { MatchTypeBadge } from "./MatchTypeBadge";
 import { ExposureIndicator } from "./ExposureIndicator";
 import { SpouseDisclosure } from "./SpouseDisclosure";
+import { ScoreBreakdownBar } from "./ScoreBreakdownBar";
+import { CnaeLabel } from "./CnaeLabel";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface QsaRelationshipCardProps {
@@ -118,22 +120,23 @@ export function QsaRelationshipCard({ deputado }: QsaRelationshipCardProps) {
                         {formatBrl(rel.empresa.capital_social)}
                       </span>
                     )}
-                    <span className={`text-xs font-semibold font-mono ${
-                      rel.score_conflito === 0 ? "text-green-400" :
-                      rel.score_conflito < 50 ? "text-amber-400" :
-                      "text-red-400"
-                    }`}>
-                      {rel.score_conflito}/100
-                    </span>
-                    {rel.empresa.cnae_principal && (
-                      <span className="text-xs font-mono text-gray-500">{rel.empresa.cnae_principal}</span>
-                    )}
+                    <CnaeLabel
+                      cnaePrincipal={rel.empresa.cnae_principal}
+                      cnaeDescricao={rel.empresa.cnae_descricao}
+                    />
                   </div>
                   <div className="flex flex-wrap gap-2 mt-2">
                     <ConflictBadge hasConflict={rel.conflito_interesse} score={rel.score_conflito} />
                     <MatchTypeBadge relationshipType={rel.relationship_type} />
                     <ExposureIndicator altaExposicao={rel.alta_exposicao} capitalSocial={rel.empresa.capital_social} />
                     <SpouseDisclosure viaConjuge={rel.via_conjuge} />
+                  </div>
+                  <div className="mt-3">
+                    <ScoreBreakdownBar
+                      scoreConflito={rel.score_conflito}
+                      altaExposicao={rel.alta_exposicao}
+                      relationshipType={rel.relationship_type}
+                    />
                   </div>
                 </div>
               ))}
