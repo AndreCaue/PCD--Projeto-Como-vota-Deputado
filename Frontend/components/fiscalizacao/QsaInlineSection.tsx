@@ -8,6 +8,7 @@ import { ConflictBadge } from "./ConflictBadge";
 import { MatchTypeBadge } from "./MatchTypeBadge";
 import { ExposureIndicator } from "./ExposureIndicator";
 import { SpouseDisclosure } from "./SpouseDisclosure";
+import { CnaeLabel } from "./CnaeLabel";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface QsaInlineSectionProps {
@@ -110,6 +111,12 @@ export function QsaInlineSection({ deputadoId }: QsaInlineSectionProps) {
                       R$ {rel.empresa.capital_social.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </p>
                   )}
+                  <div className="mt-1">
+                    <CnaeLabel
+                      cnaePrincipal={rel.empresa.cnae_principal}
+                      cnaeDescricao={rel.empresa.cnae_descricao}
+                    />
+                  </div>
                   <div className="flex flex-wrap gap-2 mt-1">
                     <ConflictBadge hasConflict={rel.conflito_interesse} score={rel.score_conflito} />
                     <MatchTypeBadge relationshipType={rel.relationship_type} />
