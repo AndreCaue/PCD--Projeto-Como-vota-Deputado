@@ -1,108 +1,52 @@
 ---
-phase: 02
-slug: enhancement
-status: validated
-nyquist_compliant: true
-wave_0_complete: true
-created: 2026-06-12
-updated: 2026-06-13
+phase: 02-enhancement
+phase_name: Enhancement
+milestone: v1.0
+validation_date: "2026-06-15"
+status: VALIDATED
 ---
 
-# Phase 2 — Validation Strategy
+# Phase 2: Enhancement — Validation
 
-> Per-phase validation contract for feedback sampling during execution.
+## Validation Scope
 
----
+The system uses fuzzy name matching to catch spouse-linked companies (rapidfuzz, threshold 75), flags high financial exposure (>1M capital) and spouse relationships, provides a paginated filtered listing of all deputy-company relationships, tracks data freshness with confidence indicators, supports incremental weekly QSA updates without duplicates, and optimizes query performance with database indices. The paginated listing endpoint works correctly but lacks formal plan-level documentation for one implementation plan.
 
-## Test Infrastructure
+## Requirements Traceability Matrix
 
-| Property | Value |
-|----------|-------|
-| **Framework** | pytest 7.x |
-| **Config file** | `Backend/conftest.py` |
-| **Quick run command** | `cd Backend && pytest tests/ -x -q` |
-| **Full suite command** | `cd Backend && pytest tests/ -v` |
-| **Estimated runtime** | ~30 seconds |
+| REQ-ID | Description | Status | Validation Evidence | Automated Test | Validated |
+|--------|-------------|--------|---------------------|----------------|-----------|
+| MAT-02 | Spouse fuzzy name matching (rapidfuzz, threshold 75) | ✅ | UAT test 10: Spouse-linked companies correctly identified via fuzzy name match with rapidfuzz at threshold 75 | Fuzzy matching tests | ✅ |
+| CONF-03 | High exposure flag (capital_social > 1,000,000) | ✅ | UAT test 7: alta_exposicao flag correctly set for relationships with capital_social > 1M | Integration test | ✅ |
+| CONF-04 | via_conjuge flag for spouse-name matches | ✅ | UAT test 8: via_conjuge flag set to True for fuzzy name matches (spouse relationships) | Integration test | ✅ |
+| API-02 | GET /deputados/empresas paginated listing with filters | ⚠️ | UAT test 3 passes: Route exists at deputados.py:13, all filters work (partido, estado, tem_conflito, alta_exposicao, conflito_interesse), pagination correct, inline freshness included. BUT no 02-04-SUMMARY.md filed — plan-level documentation gap. | Integration filter tests | ⚠️ Partial |
+| API-04 | Freshness + confidence in API responses | ✅ | UAT tests 4,5: API responses include ultima_atualizacao timestamp and confidence indicator | Freshness tests | ✅ |
+| INF-02 | Incremental weekly QSA updates via sqlite_upsert | ✅ | Incremental import tested — upsert processes only new/changed records without creating duplicates via on_conflict_do_update | Upsert integration tests | ✅ |
+| INF-04 | Database indices for efficient querying | ✅ | Query performance adequate with indexed columns — idx_relacoes_deputado_cnpj, idx_relacoes_alta_exposicao, idx_relacoes_conflito_interesse verified via SQLite schema inspection | Schema inspection | ✅ |
+| DQ-01 | Data vintage tracking and freshness indicators | ✅ | UAT: Freshness timestamp and row_count correct in API responses. **Bug fixed:** processar_csv_socios() missing `return total` resolved. QsaMetadata row_count works correctly. | test_importar_qsa_metadata_creation | ✅ |
+| DQ-04 | Staleness alerts (dados_antigos > 45 days) | ✅ | GET /qsa/freshness returns dados_antigos flag based on elapsed days. check_qsa_freshness auto-triggers on staleness. | Staleness threshold tests | ✅ |
 
----
+## Validation Evidence
 
-## Sampling Rate
+**User-facing validation:** A citizen can use the enhanced system to:
+- View all deputy-company relationships in a paginated listing with filters by party, state, conflict status, and high exposure (API-02)
+- Identify spouse-linked companies through fuzzy name matching with a 75% similarity threshold (MAT-02)
+- See high financial exposure flagged when capital exceeds R$1M (CONF-03)
+- Recognize spouse relationships through the via_conjuge flag (CONF-04)
+- Check data freshness with timestamps and confidence indicators in every API response (API-04, DQ-01)
+- Trust that weekly data updates are incremental and don't create duplicate records (INF-02)
+- Receive staleness alerts when data is older than 45 days (DQ-04)
+- Experience responsive query performance thanks to database indices (INF-04)
 
-- **After every task commit:** `cd Backend && pytest tests/ -x -q`
-- **After every plan wave:** `cd Backend && pytest tests/ -v`
-- **Before `/gsd-verify-work`:** Full suite must be green
-- **Max feedback latency:** 30 seconds
+**Automated test evidence:** Full test suite passes (86+ tests). Key test areas cover fuzzy matching, incremental upsert, and freshness tracking. Integration tests confirm all filter combinations on GET /deputados/empresas work correctly.
 
----
+**UAT evidence:** Phase 2 UAT: 11/11 tests passing. All functional acceptance criteria met.
 
-## Per-Task Verification Map
+## Known Limitations
 
-| Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
-|---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 02-01-01 | 01 | 1 | CONF-03 | — | alta_exposicao flag when capital_social > threshold | unit | `pytest tests/test_qsa_flags.py -x -k "alta_exposicao"` | ✅ | ✅ covered |
-| 02-01-02 | 01 | 1 | CONF-04 | — | via_conjuge=True for nome_match rels | unit | `pytest tests/test_qsa_flags.py -x -k "via_conjuge"` | ✅ | ✅ covered |
-| 02-01-03 | 01 | 1 | MAT-02 | — | Confidence tiers 100/85/60/0 | unit | `pytest tests/test_qsa_matching.py -x -k "confidence_tier"` | ✅ | ✅ covered |
-| 02-02-01 | 02 | 1 | INF-02 | — | Incremental upsert doesn't duplicate rows | integration | `pytest tests/test_qsa_ingest.py -x -k "upsert or capital_parsing"` | ✅ | ✅ covered |
-| 02-02-02 | 02 | 1 | DQ-01 | — | qsa_metadata tracks import metadata | integration | `pytest tests/test_qsa_ingest.py -x -k "metadata_creation"` | ✅ | ✅ covered |
-| 02-03-01 | 03 | 2 | API-02 | — | GET /deputados/empresas pagination | integration | `pytest tests/test_api_deputados.py -x -k "empresas"` | ✅ | ✅ covered |
-| 02-03-02 | 03 | 2 | API-04 | — | Freshness flags in responses | integration | `pytest tests/test_api_deputados.py -x -k "freshness"` | ✅ | ✅ covered |
-| 02-03-03 | 03 | 2 | INF-04 | — | Indices created after migration | unit | `pytest tests/test_database.py -x -k "indices"` | ✅ | ✅ covered |
-| 02-04-01 | 04 | 2 | DQ-04 | — | Staleness flag true >45 days | integration | `pytest tests/test_api_deputados.py -x -k "dados_antigos"` | ✅ | ✅ covered |
+1. **API-02 (⚠️ Partial):** No 02-04-SUMMARY.md was filed for the implementation plan that created this endpoint. The route works correctly with all filters, UAT test 3 passes, and the implementation is verified — but the plan-level documentation chain is incomplete. This is a documentation gap, not a functional one.
+2. **DQ-01 bug:** `processar_csv_socios()` was missing `return total` — this was found post-implementation and fixed in commit a0a434b (2026-06-13). Fix verified: QsaMetadata row_count now works correctly.
 
----
+## Validation Conclusion
 
-## Wave 0 Requirements
-
-- [x] `tests/test_qsa_flags.py` — alta_exposicao, via_conjuge flag tests (8 tests)
-- [x] `tests/test_api_deputados.py` — GET /deputados/empresas, GET /qsa/freshness tests (8 tests)
-- [x] `tests/test_qsa_ingest.py` — Incremental upsert idempotency + metadata tests (2 new tests)
-- [x] `tests/test_database.py` — Database index verification (1 new test)
-- [x] `tests/test_qsa_matching.py` — Confidence tier-specific tests (3 new tests)
-- [x] `tests/conftest.py` — new fixtures: sample_qsa_metadata, sample_empresa_with_capital
-
----
-
-## Manual-Only Verifications
-
-| Behavior | Requirement | Why Manual | Test Instructions |
-|----------|-------------|------------|-------------------|
-| Auto-startup freshness check triggers incremental update | INF-02 | Requires server startup cycle | Start server, check logs for `asyncio.create_task` execution |
-
----
-
-## Validation Audit 2026-06-12
-
-| Metric | Count |
-|--------|-------|
-| Gaps found | 7 |
-| Resolved | 6 |
-| Escalated | 1 |
-| Total tests | 74 (60 existing + 14 new) |
-| Test suite | `cd Backend && pytest tests/ -x -q` — green |
-
-## Validation Audit 2026-06-13
-
-| Metric | Count |
-|--------|-------|
-| Gaps found | 1 (remaining escalated: DQ-01) |
-| Resolved | 1 |
-| Escalated | 0 |
-| Total tests | 86 (all Phase 2 + Phase 1) |
-| Test suite | `cd Backend && pytest tests/ -x -q` — green |
-
----
-
-**Resolved 2026-06-13:** Added `return total` to `processar_csv_socios()` in `import_qsa.py:101`. DQ-01 metadata test (`test_importar_qsa_metadata_creation`) now passes naturally without monkeypatch.
-
----
-
-## Validation Sign-Off
-
-- [x] All tasks have `<automated>` verify or Wave 0 dependencies (7/7 automated)
-- [x] Sampling continuity: no 3 consecutive tasks without automated verify
-- [x] Wave 0 covers all MISSING references
-- [x] No watch-mode flags
-- [x] Feedback latency < 30s
-- [x] `nyquist_compliant: true` set in frontmatter
-
-**Approval:** ✅ Phase 2 Nyquist-compliant — all 9 tasks have automated verification. DQ-01 escalation resolved 2026-06-13.
+**8/9 requirements fully validated, 1 partial.** All functional requirements from the user perspective are satisfied. The API-02 partial status is a documentation gap (missing plan-level SUMMARY.md), not a functional deficiency — the endpoint works correctly with all filters and passes UAT. The system delivers enhanced transparency: citizens can explore, filter, and understand deputy-company relationships with data quality indicators.
