@@ -1,4 +1,11 @@
 import { cn } from "@/lib/utils"
+import { Info } from "lucide-react"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface ConflictBadgeProps {
   hasConflict: boolean
@@ -24,8 +31,26 @@ export function ConflictBadge({ hasConflict, score }: ConflictBadgeProps) {
 
   if (score !== undefined) {
     return (
-      <span className={cn("group relative")}>
+      <span className={cn("inline-flex items-center")}>
         {badge}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={(e) => e.stopPropagation()}
+                className="ml-1 inline-flex"
+                aria-label="Sobre os scores"
+              >
+                <Info className="w-3.5 h-3.5 text-gray-500 hover:text-gray-300" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-xs text-xs">
+              Os scores são indicadores algorítmicos baseados em dados públicos
+              da Receita Federal e não constituem determinação legal de conflito
+              de interesses.
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </span>
     )
   }
