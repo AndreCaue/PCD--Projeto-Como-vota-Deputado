@@ -512,22 +512,25 @@ status: VALIDATED
 | A3 | All existing Tailwind breakpoints (sm/md/lg) are sufficient for responsive audit | Mobile Responsive | Low — D-10 explicitly says no custom breakpoints needed |
 | A4 | The `score_conflito` field is always the sum of individual factors | Score Bar | Medium — verified against backend code in `relacao_service.py:125-132`; if the formula changes, the client-side derivation breaks silently |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should `cnae_conflito` be added to the backend API response?**
    - What we know: Client-side derivation works for the bar but requires duplicating CNAE class check logic. The backend already computes `cnae_conflito` in `gerar_relacoes_deputado()` but doesn't expose it in `get_relacoes_com_detalhes()`.
    - What's unclear: Whether the added complexity of a backend change is worth the elegance gain.
    - **Recommendation:** Either approach works. Implementation discretion — if client-side detection is used, centralize the conflict-class array in a shared constant. If backend change is preferred, add to `get_relacoes_com_detalhes()` response dict (minimal change, 3-5 lines).
+   - **RESOLVED:** Client-side derivation adopted. Plans use `alta_exposicao`, `relationship_type`, `score_conflito` directly — no backend changes needed.
 
 2. **Should CNAE labels also appear in QsaInlineSection (deputy profile)?**
    - What we know: QsaInlineSection currently shows company name, CNPJ, capital, and badge row — but not CNAE info.
    - What's unclear: QSA-13 targets "all QSA pages" vs. only the card expanded section.
    - **Recommendation:** For consistency, add CNAE labels to QsaInlineSection relationship rows. This aligns with the "Polish" mandate of the phase and ensures deputy profile page shows the same detail as the card.
+   - **RESOLVED:** Yes — CNAE labels added to QsaInlineSection via 06-01-PLAN.md task T3.
 
 3. **Is the disclaimer banner dismissable or always visible?**
    - What we know: D-11 says "page-level banner" but doesn't specify dismissability.
    - What's unclear: A permanent banner takes screen space; a dismissable one requires LocalStorage state.
    - **Recommendation:** Start non-dismissable (static banner, compact one-line design). If it feels intrusive during implementation, add a dismiss button with LocalStorage persistence.
+   - **RESOLVED:** Non-dismissable static banner adopted per D-11/D-12 guidance. No LocalStorage needed for initial delivery (06-02-PLAN.md).
 
 ## Environment Availability
 
