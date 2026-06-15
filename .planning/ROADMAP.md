@@ -105,13 +105,12 @@ Plans:
   5. User can navigate to `/fiscalizacao` from the app's main navigation
   6. VALIDATION.md exists for all 3 v1.0 phases — Nyquist compliance artifact present
   7. Docker compose correctly wires backend service
-**Plans**: 4/4 complete
+**Plans**: 3 plans (2 waves)
 **UI hint**: yes
 Plans:
-- [ ] 06-01-PLAN.md — Score visualization (CSS breakdown bar, legend, interpretation disclaimer)
-- [ ] 06-02-PLAN.md — CNAE labels (human-readable labels from seeded mapping)
-- [ ] 06-03-PLAN.md — Mobile responsiveness (responsive layout for QSA pages)
-- [ ] 06-04-PLAN.md — Docker wiring + VALIDATION.md for phases 1-3
+- [ ] 06-01-PLAN.md — Score viz + CNAE labels: CSS 50/30/20 bar, legend, CnaeLabel with conflict-class coloring (QSA-12, QSA-13)
+- [ ] 06-02-PLAN.md — Disclaimer + Mobile responsive: page-level banner, per-card info icon, responsive audit at sm/md (DOCS-03, QSA-14)
+- [ ] 06-03-PLAN.md — Compliance + Docker: VALIDATION.md x3, healthchecks, build test, DOCS-02 verify (DOCS-01, DOCS-04, DOCS-02)
 
 ## Progress
 

@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Frontend QSA + Cleanup
 status: active
-last_updated: "2026-06-15T09:04:49.493Z"
+last_updated: "2026-06-15T09:45:00.000Z"
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 7
+  total_plans: 10
   completed_plans: 7
   percent: 33
 ---
@@ -26,7 +26,8 @@ Plan: 2 of 4
 **Phase**: 5 — QSA Dashboard Core (planned)
 **Plan**: 4 plans in 2 waves
 **Status**: 📋 Phase 5 planned — 4 plan docs verified
-**Last activity**: 2026-06-14 — Phase 5 planned (4 plans)
+**Phase 6**: ✅ Planned — 3 plans in 2 waves
+**Last activity**: 2026-06-15 — Phase 6 planned (3 plans)
 
 ## Project Reference
 
@@ -53,7 +54,7 @@ See: .planning/PROJECT.md (updated 2026-06-13)
 - [x] 6 files with `datetime.utcnow()` deprecation (all replaced with timezone-aware)
 - [x] Dead code: `import_empresas.py`, `import_socios.py`, `importar_qsa_completo()` (removed)
 - [x] No VERIFICATION.md for phases 1-3 (all 3 created)
-- [ ] No VALIDATION.md for Phase 3 (scheduled for Phase 6)
+- [x] No VALIDATION.md for Phase 3 (scheduled for Phase 6 — resolved in Phase 6 plan 06-03)
 
 ### Key Decisions (v1.0 carry-forward)
 
@@ -68,7 +69,7 @@ See: .planning/PROJECT.md (updated 2026-06-13)
 |-------|------|------|--------|
 | 4. Cleanup & Foundation | Fix blockers, tech debt, QSA service layer, VERIFICATION.md | 6 | ✅ Complete |
 | 5. QSA Dashboard Core | /fiscalizacao page, cards, badges, filters, deputado profile section | 11 | 📋 Planned |
-| 6. Polish & Compliance | Score viz, CNAE labels, mobile responsive, VALIDATION.md, Docker | 7 | Not started |
+| 6. Polish & Compliance | Score viz, CNAE labels, mobile responsive, VALIDATION.md, Docker | 7 | 📋 Planned |
 
 ### Blockers
 
@@ -81,7 +82,7 @@ None currently — Phase 4 resolves all v1.0 blockers first.
 - [x] Execute Phase 4
 - [x] Plan Phase 5
 - [ ] Execute Phase 5
-- [ ] Plan Phase 6
+- [x] Plan Phase 6
 - [ ] Execute Phase 6
 - [ ] Close v1.1 milestone
 
@@ -89,7 +90,7 @@ None currently — Phase 4 resolves all v1.0 blockers first.
 
 **Last session:** 2026-06-15T09:04:49.438Z
 **Resume file:** .planning/phases/06-polish-compliance/06-CONTEXT.md
-**Next step:** `/gsd-execute-phase 05` to execute the QSA Dashboard Core phase
+**Next step:** `/gsd-execute-phase 05` to execute Phase 5, then `/gsd-execute-phase 06` for Phase 6
 
 ## UI-SPEC Status
 
