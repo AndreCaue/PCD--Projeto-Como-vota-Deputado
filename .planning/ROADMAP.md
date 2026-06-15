@@ -83,9 +83,14 @@ Plans:
   4. User can filter relationships by conflict status, exposure, and spouse match; sort by score/capital/name
   5. User sees aggregate stats cards (total, conflito, exposicao, conjuge) at page top
   6. User can view QSA relationships inline on any deputy's profile page
-  7. User sees appropriate empty states ("Nenhuma relação encontrada") and error states with retry button
-**Plans**: TBD
+   7. User sees appropriate empty states ("Nenhuma relação encontrada") and error states with retry button
+**Plans**: 4 plans (2 waves)
 **UI hint**: yes
+Plans:
+- [ ] 05-01-PLAN.md — Backend API enhancements (sort, spouse filter, aggregate counts) + types update
+- [ ] 05-02-PLAN.md — Core display components (badges, indicators, states, tooltip, barrel)
+- [ ] 05-03-PLAN.md — Main /fiscalizacao dashboard page (cards, summary, filter, pagination)
+- [ ] 05-04-PLAN.md — QSA inline section on deputy profile + nav link
 
 ### Phase 6: Polish & Compliance
 **Goal**: Polish edge cases, add compliance documentation, ensure mobile readiness and score transparency
@@ -110,5 +115,5 @@ Plans:
 | 2. Enhancement | v1.0 | 4/4 | ✅ Complete | 2026-06-12 |
 | 3. Intelligence | v1.0 | 4/4 | ✅ Complete | 2026-06-13 |
 | 4. Cleanup & Foundation | v1.1 | 3/3 | ✅ Complete | 2026-06-14 |
-| 5. QSA Dashboard Core | v1.1 | 0/0 | Not started | - |
+| 5. QSA Dashboard Core | v1.1 | 0/4 | In planning | - |
 | 6. Polish & Compliance | v1.1 | 0/0 | Not started | - |
