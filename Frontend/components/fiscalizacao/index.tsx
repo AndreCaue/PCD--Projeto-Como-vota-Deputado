@@ -16,3 +16,4 @@ export { QsaFilterBar } from "./QsaFilterBar";
 export { QsaInlineSection } from "./QsaInlineSection";
 export { ScoreBreakdownBar } from "./ScoreBreakdownBar";
 export { CnaeLabel } from "./CnaeLabel";
+export { DisclaimerBanner } from "./DisclaimerBanner";

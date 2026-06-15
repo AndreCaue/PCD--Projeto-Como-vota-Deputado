@@ -11,6 +11,7 @@ interface PaginationMeta {
   limit: number;
   totalPages: number;
 }
+import { DisclaimerBanner } from "@/components/fiscalizacao/DisclaimerBanner";
 import { QsaFreshnessBanner } from "@/components/fiscalizacao/QsaFreshnessBanner";
 import { QsaSummaryCards } from "@/components/fiscalizacao/QsaSummaryCards";
 import { QsaFilterBar } from "@/components/fiscalizacao/QsaFilterBar";
@@ -116,6 +117,8 @@ export function FiscalizacaoDashboard() {
 
       {!loading && (
         <>
+          <DisclaimerBanner />
+
           <div className="mb-6">
             <QsaSummaryCards stats={stats} />
           </div>
