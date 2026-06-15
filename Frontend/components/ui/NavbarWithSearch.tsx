@@ -79,6 +79,12 @@ export default function NavbarWithSearch() {
                 Grafo
               </Link>
               <Link
+                href="/fiscalizacao"
+                className="px-3 py-1.5 rounded-lg hover:text-white hover:bg-gray-800 transition-all"
+              >
+                Fiscalização
+              </Link>
+              <Link
                 href="/dashboard"
                 className="px-3 py-1.5 rounded-lg hover:text-white hover:bg-gray-800 transition-all"
               >

@@ -16,6 +16,7 @@ import {
   PatrimonioCardSkeleton,
 } from "@/components/patrimonio/PatrimonioCard";
 import { ListaBens } from "@/components/patrimonio/ListaBens";
+import { QsaInlineSection } from "@/components/fiscalizacao/QsaInlineSection";
 
 export default function DeputadoPage() {
   const { id } = useParams<{ id: string }>();
@@ -136,6 +137,9 @@ export default function DeputadoPage() {
           </div>
         </div>
       ) : null}
+
+      {/* QSA Relationships inline section */}
+      {deputado && <QsaInlineSection deputadoId={id} deputadoNome={deputado.nome} />}
 
       {/* Estatísticas de votação */}
       {stats && stats.total > 0 && (
