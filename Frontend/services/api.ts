@@ -233,6 +233,8 @@ export interface DeputadoEmpresa {
   estado: string;
   total_empresas: number;
   total_conflito: number;
+  total_alta_exposicao?: number;
+  total_conjuge?: number;
 }
 
 export interface RelacaoDetalhada {
