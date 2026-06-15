@@ -13,3 +13,4 @@ export { QsaErrorState } from "./QsaErrorState";
 export { QsaRelationshipCard } from "./QsaRelationshipCard";
 export { QsaSummaryCards } from "./QsaSummaryCards";
 export { QsaFilterBar } from "./QsaFilterBar";
+export { QsaInlineSection } from "./QsaInlineSection";
