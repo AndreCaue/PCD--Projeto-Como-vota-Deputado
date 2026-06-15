@@ -3,11 +3,19 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from ..database import get_db
 from ..models.deputado import Deputado
 from ..models.partido import Partido
-from ..models.empresa import Relacao
+from ..models.empresa import Relacao, Empresa
 from ..models.votacao import Voto, Votacao
 from ..services.relacao_service import RelacaoService
 
 router = APIRouter(prefix="/deputados", tags=["Deputados"])
+
+
+from sqlalchemy import asc as _asc, desc as _desc
+
+def sort_order_direction(order: str):
+    if order == "asc":
+        return lambda col: _asc(col)
+    return lambda col: _desc(col)
 
 
 @router.get("/empresas")
@@ -17,11 +25,27 @@ def list_deputados_empresas(
     tem_conflito: bool = None,
     alta_exposicao: bool = None,
     conflito_interesse: bool = None,
+    tem_conjuge: bool = None,
+    sort_by: str = Query(None),
+    sort_order: str = Query("desc"),
     page: int = Query(1, ge=1, le=200),
     limit: int = Query(50, ge=1, le=200),
     db: Session = Depends(get_db)
 ):
     from sqlalchemy import func, case
+
+    valid_sort_fields = {"score", "capital", "nome"}
+    if sort_by is not None and sort_by not in valid_sort_fields:
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=422,
+            detail=f"sort_by must be one of: {', '.join(sorted(valid_sort_fields))}"
+        )
+    if sort_order not in ("asc", "desc"):
+        raise HTTPException(
+            status_code=422,
+            detail="sort_order must be 'asc' or 'desc'"
+        )
 
     query = (
         db.query(
@@ -33,8 +57,15 @@ def list_deputados_empresas(
             func.sum(
                 case((Relacao.conflito_interesse == True, 1), else_=0)
             ).label("total_conflito"),
+            func.sum(
+                case((Relacao.alta_exposicao == True, 1), else_=0)
+            ).label("total_alta_exposicao"),
+            func.sum(
+                case((Relacao.via_conjuge == True, 1), else_=0)
+            ).label("total_conjuge"),
         )
         .outerjoin(Relacao, Deputado.id == Relacao.deputado_id)
+        .outerjoin(Empresa, Relacao.cnpj == Empresa.cnpj)
         .outerjoin(Partido, Deputado.partido_id == Partido.id)
     )
 
@@ -56,8 +87,29 @@ def list_deputados_empresas(
         query = query.filter(Relacao.conflito_interesse == conflito_interesse)
     if alta_exposicao is not None:
         query = query.filter(Relacao.alta_exposicao == alta_exposicao)
+    if tem_conjuge is not None:
+        if tem_conjuge:
+            query = query.filter(Relacao.via_conjuge == True)
+        else:
+            query = query.filter(
+                ~db.query(Relacao.deputado_id)
+                .filter(Relacao.deputado_id == Deputado.id)
+                .filter(Relacao.via_conjuge == True)
+                .exists()
+            )
 
-    query = query.group_by(Deputado.id).order_by(func.count(Relacao.cnpj).desc())
+    query = query.group_by(Deputado.id)
+
+    sort_mapping = {
+        "score": func.sum(case((Relacao.conflito_interesse == True, 1), else_=0)),
+        "capital": func.sum(Empresa.capital_social),
+        "nome": Deputado.nome,
+    }
+    order_dir = sort_order_direction(sort_order)
+    if sort_by and sort_by in sort_mapping:
+        query = query.order_by(order_dir(sort_mapping[sort_by]))
+    else:
+        query = query.order_by(func.count(Relacao.cnpj).desc())
 
     total = db.query(func.count()).select_from(
         query.order_by(None).subquery()).scalar()
@@ -88,6 +140,8 @@ def list_deputados_empresas(
                 "estado": r.estado,
                 "total_empresas": r.total_empresas,
                 "total_conflito": r.total_conflito,
+                "total_alta_exposicao": r.total_alta_exposicao,
+                "total_conjuge": r.total_conjuge,
             }
             for r in rows
         ],
