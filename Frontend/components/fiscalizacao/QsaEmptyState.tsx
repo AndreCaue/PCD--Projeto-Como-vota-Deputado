@@ -8,7 +8,7 @@ export function QsaEmptyState({ variant = "filters" }: QsaEmptyStateProps) {
   const Icon = variant === "nodata" ? Building2 : SearchX
 
   return (
-    <div className="py-16 text-center">
+    <div className="py-12 sm:py-16 px-4 sm:px-0 text-center">
       <Icon className="w-12 h-12 text-gray-600 mx-auto mb-4" />
       <h3 className="text-gray-400 text-lg font-semibold">Nenhuma relação encontrada</h3>
       <p className="text-gray-500 text-sm mt-1">

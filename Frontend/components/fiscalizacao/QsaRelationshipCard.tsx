@@ -114,7 +114,7 @@ export function QsaRelationshipCard({ deputado }: QsaRelationshipCardProps) {
                 <div key={rel.id} className="border-t border-gray-800 pt-3 mt-3 first:border-t-0 first:pt-0 first:mt-0">
                   <p className="text-sm font-medium text-gray-100">{rel.empresa.razao_social}</p>
                   <p className="text-xs font-mono text-gray-400 mt-0.5">{formatCnpj(rel.cnpj)}</p>
-                  <div className="flex items-center gap-3 mt-1">
+                  <div className="flex items-center gap-3 mt-1 flex-wrap">
                     {rel.empresa.capital_social != null && (
                       <span className="text-xs font-semibold font-mono text-gray-300">
                         {formatBrl(rel.empresa.capital_social)}

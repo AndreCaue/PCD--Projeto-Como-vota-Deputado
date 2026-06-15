@@ -143,21 +143,21 @@ export function FiscalizacaoDashboard() {
               </div>
 
               {meta && meta.totalPages > 1 && (
-                <div className="flex justify-center gap-2 mt-8">
+                <div className="flex flex-wrap justify-center gap-2 mt-8">
                   <button
                     onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                     disabled={currentPage === 1}
-                    className="px-4 py-2 text-sm bg-gray-900 border border-gray-700 rounded-lg disabled:opacity-40 hover:border-gray-500 transition"
+                    className="px-4 py-2.5 text-sm bg-gray-900 border border-gray-700 rounded-lg disabled:opacity-40 hover:border-gray-500 transition"
                   >
                     Anterior
                   </button>
-                  <span className="px-4 py-2 text-sm text-gray-400">
+                  <span className="px-4 py-2.5 text-sm text-gray-400">
                     {currentPage} / {meta.totalPages}
                   </span>
                   <button
                     onClick={() => handlePageChange(Math.min(meta.totalPages, currentPage + 1))}
                     disabled={currentPage === meta.totalPages}
-                    className="px-4 py-2 text-sm bg-gray-900 border border-gray-700 rounded-lg disabled:opacity-40 hover:border-gray-500 transition"
+                    className="px-4 py-2.5 text-sm bg-gray-900 border border-gray-700 rounded-lg disabled:opacity-40 hover:border-gray-500 transition"
                   >
                     Próxima
                   </button>

@@ -71,8 +71,8 @@ export function QsaFilterBar({ filter, sort, onFilterChange, onSortChange }: Qsa
                       onSortChange(opt.value);
                       setSortOpen(false);
                     }}
-                    className={cn(
-                      "flex items-center gap-2 w-full px-2 py-1.5 text-sm rounded-md transition-colors",
+                      className={cn(
+                        "flex items-center gap-2 w-full px-2 py-2 text-sm rounded-md transition-colors",
                       sort === opt.value
                         ? "text-brasil-amarelo bg-brasil-amarelo/10"
                         : "text-gray-300 hover:bg-gray-800"
