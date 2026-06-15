@@ -14,3 +14,5 @@ export { QsaRelationshipCard } from "./QsaRelationshipCard";
 export { QsaSummaryCards } from "./QsaSummaryCards";
 export { QsaFilterBar } from "./QsaFilterBar";
 export { QsaInlineSection } from "./QsaInlineSection";
+export { ScoreBreakdownBar } from "./ScoreBreakdownBar";
+export { CnaeLabel } from "./CnaeLabel";
