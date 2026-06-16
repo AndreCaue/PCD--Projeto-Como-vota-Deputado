@@ -24,6 +24,8 @@ tasks:
       - Frontend/components/fiscalizacao/QsaEmptyState.tsx
       - Frontend/components/fiscalizacao/QsaErrorState.tsx
       - Frontend/components/fiscalizacao/index.tsx
+requirements-completed: [QSA-03, QSA-04, QSA-05, QSA-06, QSA-07, QSA-11]
+verification: 05-VERIFICATION.md
 ---
 
 ## Summary
