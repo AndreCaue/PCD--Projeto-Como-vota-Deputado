@@ -3,7 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0** — Phases 1-3 (shipped 2026-06-13)
-- 🚧 **v1.1** — Phases 4-6 (Frontend QSA + Cleanup)
+- 🚧 **v1.1** — Phases 4-7 (Frontend QSA + Cleanup + Tech debt)
 
 ## Phases
 
@@ -12,7 +12,8 @@
 - [x] **Phase 3: Intelligence** — Conflict detection, scoring, CNAE analysis — *shipped v1.0*
 - [ ] **Phase 4: Cleanup & Foundation** — Fix blockers, tech debt cleanup, QSA service layer, VERIFICATION.md
 - [x] **Phase 5: QSA Dashboard Core** — /fiscalizacao route, relationship cards, badges, filters, deputado profile section
-- [ ] **Phase 6: Polish & Compliance** — Score viz, CNAE labels, mobile responsive, VALIDATION.md, Docker wiring
+- [x] **Phase 6: Polish & Compliance** — Score viz, CNAE labels, mobile responsive, VALIDATION.md, Docker wiring (completed 2026-06-15)
+- [ ] **Phase 7: Address tech debt** — SUMMARY frontmatter + VERIFICATION.md
 
 ## Phase Details
 
@@ -61,8 +62,6 @@
 
 **Plans**: 4/4 complete
 **Completed**: 2026-06-13
-
----
 
 ### Phase 4: Cleanup & Foundation
 
@@ -131,12 +130,26 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 06-01-PLAN.md — Score viz + CNAE labels: CSS 50/30/20 bar, legend, CnaeLabel with conflict-class coloring (QSA-12, QSA-13)
-- [ ] 06-03-PLAN.md — Compliance + Docker: VALIDATION.md x3, healthchecks, build test, DOCS-02 verify (DOCS-01, DOCS-04, DOCS-02)
+- [x] 06-01-PLAN.md — Score viz + CNAE labels: CSS 50/30/20 bar, legend, CnaeLabel with conflict-class coloring (QSA-12, QSA-13)
+- [x] 06-03-PLAN.md — Compliance + Docker: VALIDATION.md x3, healthchecks, build test, DOCS-02 verify (DOCS-01, DOCS-04, DOCS-02)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 06-02-PLAN.md — Disclaimer + Mobile responsive: page-level banner, per-card info icon, responsive audit at sm/md (DOCS-03, QSA-14)
+- [x] 06-02-PLAN.md — Disclaimer + Mobile responsive: page-level banner, per-card info icon, responsive audit at sm/md (DOCS-03, QSA-14)
+
+### Phase 7: Address tech debt: SUMMARY frontmatter + VERIFICATION.md
+
+**Goal:** Close accumulated tech debt across all v1.1 phases — add `requirements-completed` + `verification` YAML frontmatter to Phase 5 SUMMARY files, create VERIFICATION.md for phases 4-6, update REQUIREMENTS.md traceability checkboxes, and fix STATE.md progress display.
+**Requirements**: D-01, D-02, D-03, D-04, D-05, D-06, D-07, D-08, D-09
+**Depends on:** Phase 6
+**Plans:** 3 plans (1 wave)
+
+Plans:
+**Wave 1**
+
+- [x] 07-01-PLAN.md — Update Phase 5 SUMMARY frontmatter: add requirements-completed + verification to 05-01 through 05-04 (D-01 to D-04)
+- [x] 07-02-PLAN.md — Create VERIFICATION.md for phases 4, 5, 6: one file per phase following v1.0 format (D-05 to D-07)
+- [x] 07-03-PLAN.md — Update REQUIREMENTS.md checkboxes (24 [ ]→[x]) + STATE.md progress (completed_phases: 3→6, percent: 50→100) (D-08, D-09)
 
 ## Progress
 
@@ -147,4 +160,5 @@ Plans:
 | 3. Intelligence | v1.0 | 4/4 | ✅ Complete | 2026-06-13 |
 | 4. Cleanup & Foundation | v1.1 | 3/3 | ✅ Complete | 2026-06-14 |
 | 5. QSA Dashboard Core | v1.1 | 4/4 | ✅ Complete | 2026-06-15 |
-| 6. Polish & Compliance | v1.1 | 0/0 | Not started | - |
+| 6. Polish & Compliance | v1.1 | 3/3 | Complete   | 2026-06-15 |
+| 7. Address tech debt | v1.1 | 0/3 | 📋 Planned | |
