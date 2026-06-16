@@ -14,6 +14,8 @@ tasks:
     files:
       - Frontend/app/deputados/[id]/page.tsx
       - Frontend/components/ui/NavbarWithSearch.tsx
+requirements-completed: [QSA-10]
+verification: 05-VERIFICATION.md
 ---
 
 ## Summary
