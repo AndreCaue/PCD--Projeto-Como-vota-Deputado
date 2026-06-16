@@ -12,6 +12,8 @@ tasks:
   - task: "Update DeputadoEmpresa interface in Frontend"
     status: done
     files: [Frontend/services/api.ts]
+requirements-completed: [QSA-01, QSA-08, QSA-09]
+verification: 05-VERIFICATION.md
 ---
 
 ## Summary
