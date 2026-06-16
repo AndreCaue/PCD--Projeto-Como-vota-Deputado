@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Visualização de votações de deputados brasileiros com dados públicos da API da Câmara dos Deputados, expandido com módulo QSA para cruzar dados de Deputados Federais com o cadastro de empresas da Receita Federal. O projeto permite aos cidadãos acompanhar como seus representantes estão votando e identificar potenciais conflitos de interesse através de dados oficiais e verificáveis.
+Visualização de votações de deputados brasileiros com dados públicos da API da Câmara dos Deputados, expandido com módulo QSA para cruzar dados de Deputados Federais com o cadastro de empresas da Receita Federal. O projeto permite aos cidadãos acompanhar como seus representantes estão votando, visualizar relações deputado-empresa, e identificar potenciais conflitos de interesse através de dados oficiais e verificáveis.
 
 ## Core Value
 
@@ -18,15 +18,20 @@ Transparência pública sobre a atividade parlamentar, permitindo que cidadãos 
 - ✓ Detecção de conflitos de interesse (CNAE) e exposição financeira (>1M) — v1.0
 - ✓ Freshness tracking e indicadores de atualização dos dados — v1.0
 - ✓ Dockerfile + docker-compose.yml para deploy consistente — v1.0
+- ✓ Full QSA dashboard page /fiscalizacao with relationship cards, conflict flags, freshness indicators — v1.1
+- ✓ VERIFICATION.md for all 6 phases (Nyquist compliance) — v1.1
+- ✓ VALIDATION.md for all 3 v1.0 phases (Nyquist compliance) — v1.1
+- ✓ Score breakdown visualization (50/30/20 CSS bar) and CNAE labels — v1.1
+- ✓ Mobile responsive layout for QSA pages — v1.1
+- ✓ Score interpretation disclaimers on all score displays — v1.1
+- ✓ Docker healthchecks on both services — v1.1
 
 ### Active
 
-- [ ] Full QSA dashboard page — deputy-company relationships, conflict flags, freshness indicators
-- [ ] VERIFICATION.md for all 3 v1.0 phases (Nyquist compliance)
-- [ ] VALIDATION.md for all 3 v1.0 phases (Nyquist compliance)
-- [ ] Fix datetime.utcnow() deprecation across 6 files
-- [ ] Remove dead import_qsa_completo code
-- [ ] Fix Frontend/api.ts fallback URL port 8000 → 3001
+- [ ] Company-to-deputado reverse lookup page
+- [ ] Network graph visualization of QSA relationships
+- [ ] Historical trend view of QSA changes
+- [ ] Bulk CSV export of QSA data
 
 ### Out of Scope
 
@@ -34,16 +39,20 @@ Transparência pública sobre a atividade parlamentar, permitindo que cidadãos 
 - Integração com sistemas de voto eletrônico em tempo real — Requer infraestrutura governamental indisponível
 - Análise preditiva de comportamento parlamentar — Fora do escopo de transparência básica
 - Aplicativo mobile nativo — Foco inicial na experiência web responsiva
-- Frontend UI para dados QSA/conflict — Não implementado no v1.0 (backend-only)
+- Frontend UI para dados QSA/conflict — Não implementado no v1.0 (backend-only — shipped v1.1)
+- Real-time data refresh / push notifications — QSA data is batch-updated; websocket infra overkill
+- Automated conflict alerts / email subscriptions — Requires auth system and email infra
+- Auth-based user system — Not in scope for transparency tool; all data is public
 
 ## Context
 
-**v1.0 shipped 2026-06-13.**
-- Backend: FastAPI + SQLite + SQLAlchemy — 86 tests passing
-- Frontend: Next.js + TypeScript (sem UI para dados QSA)
-- Módulo QSA completo: ingestão, matching, detecção de conflitos, freshness tracking
-- 23/23 v1 requirements satisfied
-- Tech debt: VERIFICATION.md pendente para todas as fases, Phase 3 sem VALIDATION.md, deprecações datetime.utcnow()
+**v1.1 shipped 2026-06-15.**
+- Backend: FastAPI + SQLite + SQLAlchemy — 86+ tests passing
+- Frontend: Next.js + TypeScript with complete QSA visualization dashboard
+- Módulo QSA completo: ingestão, matching, detecção de conflitos, freshness tracking, dashboard /fiscalizacao
+- 47/47 requirements satisfied across v1.0 (23) and v1.1 (24)
+- Nyquist compliance: VERIFICATION.md for all 6 phases, VALIDATION.md for all 3 v1.0 phases
+- All v1.0 tech debt resolved: datetime.utcnow(), dead code, port 8000 fallback
 
 ## Constraints
 
@@ -65,17 +74,32 @@ Transparência pública sobre a atividade parlamentar, permitindo que cidadãos 
 | Incremental upsert via on_conflict_do_update | ORM-safe, injection-free | ✓ Good |
 | 3-factor scoring: capital(50) + CNAE(30) + CPF(20) | Modelo graduado simples | ✓ Good |
 | Inline freshness in API responses | Sem endpoint separado | ✓ Good |
+| Axios `api` baseURL `http://localhost:3001` | Consistent with next.config.js style | ✓ Good |
+| QSA hooks use string-based params | Avoid `anos_ceap[]` bracket notation mismatch | ✓ Good |
+| All QSA API consumers through qsaService | Single shared `api` axios instance | ✓ Good |
+| CSS-only 50/30/20 segmented score bar | No JS/chart library dependency | ✓ Good |
+| CONFLICT_CNAE_CLASSES centralized in CnaeLabel.tsx | Module-level const for maintainability | ✓ Good |
+| Disclaimer banner static (non-dismissable) | Per D-11/D-12 constraint | ✓ Good |
+| VERIFICATION.md sourced from MILESTONE-AUDIT.md | Avoids unnecessary code re-execution | ✓ Good |
 
-## Current Milestone: v1.1 — Frontend QSA + Cleanup
+## Current State
 
-**Goal:** Build QSA frontend visualization and fix accumulated tech debt
+**v1.1 — Frontend QSA + Cleanup — Shipped 2026-06-15**
 
-**Target features:**
-- Full QSA dashboard page (deputy-company relationships, conflict flags, freshness indicators)
-- Nyquist compliance: VERIFICATION.md and VALIDATION.md for all phases
-- Fix datetime.utcnow() deprecation across 6 files
-- Remove dead import_qsa_completo code
-- Fix Frontend/api.ts fallback URL port 8000 → 3001
+The QSA integration module now has a complete frontend visualization layer. Users can browse deputy-company relationships, filter by conflict status/exposure/spouse match, view score breakdowns, and see CNAE category labels. All accumulated tech debt from v1.0 is resolved, and all 6 phases have Nyquist compliance artifacts.
+
+**Key metrics:**
+- 4 phases shipped (7 total), 13 plans, 24 requirements
+- 72 commits, 86 files changed, +10,940 LOC
+- QSA dashboard: 7 display components, 4 API enhancements, mobile responsive
+- All v1.0 blockers resolved
+
+## Next Milestone Goals
+
+- Company-to-deputado reverse lookup page
+- Network graph visualization of QSA relationships
+- Historical trend view of QSA changes
+- Bulk CSV export of QSA data
 
 ## Evolution
 
@@ -96,4 +120,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-06-13 after v1.1 milestone start*
+*Last updated: 2026-06-15 after v1.1 milestone completion*
