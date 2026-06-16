@@ -19,6 +19,8 @@ tasks:
       - Frontend/components/fiscalizacao/QsaSummaryCards.tsx
       - Frontend/components/fiscalizacao/QsaFilterBar.tsx
       - Frontend/components/fiscalizacao/index.tsx
+requirements-completed: [QSA-01, QSA-02, QSA-08, QSA-09, QSA-11]
+verification: 05-VERIFICATION.md
 ---
 
 ## Summary
