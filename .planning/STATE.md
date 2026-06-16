@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.1
-milestone_name: Frontend QSA + Cleanup
-status: active
-last_updated: "2026-06-15T09:35:32.754Z"
+milestone_name: — shipped)
+status: Phase 06 complete
+last_updated: "2026-06-16T01:06:57.721Z"
 progress:
-  total_phases: 6
-  completed_phases: 2
+  total_phases: 7
+  completed_phases: 3
   total_plans: 10
-  completed_plans: 7
-  percent: 33
+  completed_plans: 10
+  percent: 43
 ---
 
 ## Previous Milestone: v1.0 — Integração com QSA da Receita Federal
@@ -21,8 +21,8 @@ progress:
 
 ## Current Position
 
-Phase: 05 (qsa-dashboard-core) — EXECUTING
-Plan: 2 of 4
+Phase: 06 — COMPLETE
+Plan: 3 of 3
 **Phase**: 5 — QSA Dashboard Core (planned)
 **Plan**: 4 plans in 2 waves
 **Status**: 📋 Phase 5 planned — 4 plan docs verified
@@ -34,7 +34,7 @@ Plan: 2 of 4
 See: .planning/PROJECT.md (updated 2026-06-13)
 
 **Core value:** Transparência pública sobre a atividade parlamentar, permitindo que cidadãos fiscalizem seus representantes com base em dados oficiais e verificáveis.
-**Current focus:** Phase 05 — qsa-dashboard-core
+**Current focus:** Phase 06 — polish-compliance
 
 ## Performance Metrics
 
@@ -46,6 +46,10 @@ See: .planning/PROJECT.md (updated 2026-06-13)
 | Test count | 86 (v1.0) | Extending in v1.1 |
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 7 added: Address tech debt: SUMMARY frontmatter + VERIFICATION.md
 
 ### Tech Debt from v1.0 (to resolve in v1.1)
 
@@ -88,8 +92,8 @@ None currently — Phase 4 resolves all v1.0 blockers first.
 
 ## Session Continuity
 
-**Last session:** 2026-06-15T09:04:49.438Z
-**Resume file:** .planning/phases/06-polish-compliance/06-CONTEXT.md
+**Last session:** 2026-06-16T01:06:57.689Z
+**Resume file:** .planning/phases/07-address-tech-debt-summary-frontmatter-verification-md/07-CONTEXT.md
 **Next step:** `/gsd-execute-phase 05` to execute Phase 5, then `/gsd-execute-phase 06` for Phase 6
 
 ## UI-SPEC Status
